@@ -49,6 +49,9 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  # flakes を恒久的に有効化
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
   # Define a user account. Don't forget to set a password with 'passwd'.
   # ユーザーパッケージは home-manager (home.nix) で管理する。
   users.users.lemonade = {
