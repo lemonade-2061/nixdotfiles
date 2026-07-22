@@ -4,9 +4,22 @@
 //
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Io
+import Quickshell.Services.Pipewire
 import QtQuick
 
 Scope {
+    // 既定オーディオシンクをバインド（音量の読み書きに必須）
+    PwObjectTracker { objects: [ Pipewire.defaultAudioSink ] }
+
+    // バッテリー sysfs（10秒ごとにリロード）
+    FileView { id: batCap;    path: "/sys/class/power_supply/BAT0/capacity" }
+    FileView { id: batStatus; path: "/sys/class/power_supply/BAT0/status" }
+    Timer {
+        interval: 10000; running: true; repeat: true
+        onTriggered: { batCap.reload(); batStatus.reload() }
+    }
+
     // 1 バーを全モニターに出す
     Variants {
         model: Quickshell.screens
@@ -76,14 +89,52 @@ Scope {
                 }
             }
 
-            // --- 右: 予約枠（今後 音量/電池/トレイ を足す） ---
-            Text {
+            // --- 右: 音量 / バッテリー ---
+            Row {
                 anchors.right: parent.right
                 anchors.rightMargin: 12
                 anchors.verticalCenter: parent.verticalCenter
-                color: "#888888"
-                font.pixelSize: 12
-                text: Quickshell.screens.length > 1 ? modelData.name : ""
+                spacing: 14
+
+                // 音量: ホイールで増減 / クリックでミュート
+                Text {
+                    id: volText
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 12
+                    font.bold: true
+
+                    property var sink: Pipewire.defaultAudioSink
+                    property var audio: sink && sink.ready ? sink.audio : null
+                    property int vol: audio ? Math.round(audio.volume * 100) : 0
+                    property bool muted: audio ? audio.muted : false
+
+                    color: muted ? "#888888" : "#8fd0ff"
+                    text: (muted ? "🔇 " : "🔊 ") + vol + "%"
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: if (volText.audio) volText.audio.muted = !volText.audio.muted
+                        onWheel: {
+                            if (!volText.audio) return
+                            var step = (wheel.angleDelta.y > 0 ? 0.05 : -0.05)
+                            volText.audio.volume = Math.max(0, Math.min(1, volText.audio.volume + step))
+                        }
+                    }
+                }
+
+                // バッテリー: 残量で色分け、充電中は +
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: 12
+                    font.bold: true
+
+                    property int pct: parseInt(batCap.text()) || 0
+                    property string st: batStatus.text().trim()
+                    property bool charging: st === "Charging" || st === "Full"
+
+                    color: charging ? "#7bd88f" : (pct <= 15 ? "#ff5555" : (pct <= 30 ? "#f1fa8c" : "#cccccc"))
+                    text: "🔋 " + pct + "%" + (charging ? "+" : "")
+                }
             }
         }
     }
