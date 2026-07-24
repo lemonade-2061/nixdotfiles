@@ -8,6 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ./kit-vpn.nix              # KIT Remote-VPN (openfortivpn) モジュール
     ];
 
   # Use the systemd-boot EFI boot loader.

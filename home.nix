@@ -104,6 +104,8 @@
     enable = true;
     shellAliases = {
       nrs = "sudo nixos-rebuild switch --flake /home/lemonade/nixos#nixos";
+      nrl = "nixos-rebuild list-generations";
+      "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
     };
   };
 
@@ -120,6 +122,8 @@
     };
     shellAliases = {
       nrs = "sudo nixos-rebuild switch --flake /home/lemonade/nixos#nixos";
+      nrl = "nixos-rebuild list-generations";
+      "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
     };
   };
 
