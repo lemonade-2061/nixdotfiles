@@ -41,6 +41,9 @@
     nixd                  # Nix
     bash-language-server
     texlab                # LaTeX
+    rust-analyzer
+    pyright
+    gopls
     # 使う言語が増えたらここに追記（例: pyright, rust-analyzer, gopls ...）
 
     # snacks.image レンダリング用
