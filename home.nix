@@ -26,6 +26,8 @@
     eza
     sd
     ripgrep
+    cava
+    # starship は programs.starship 側で管理（下部参照）
 
     # エディタ補助（フォーマッタ / 検索 / ゴミ箱）
     stylua        # Lua フォーマッタ (conform)
@@ -115,6 +117,16 @@
     };
     shellAliases = {
       nrs = "sudo nixos-rebuild switch --flake /home/lemonade/nixos#nixos";
+    };
+  };
+
+  # starship: クロスシェルプロンプト。zsh 連携は既定で有効。
+  # 初期設定は最小限（デフォルトプロンプト + 改行なし）。
+  programs.starship = {
+    enable = true;
+    enableZshIntegration = true;
+    settings = {
+      add_newline = false;
     };
   };
 
