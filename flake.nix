@@ -13,6 +13,12 @@
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # SDDM テーマ集 (~/git-clone/qylock にローカルclone)
+    qylock = {
+      url = "git+file:///home/lemonade/git-clone/qylock";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs, home-manager, ... }@inputs: {
@@ -20,6 +26,8 @@
       system = "x86_64-linux";
       modules = [
         ./configuration.nix
+
+        inputs.qylock.nixosModules.default
 
         home-manager.nixosModules.home-manager
         {

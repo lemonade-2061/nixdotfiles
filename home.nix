@@ -87,9 +87,10 @@
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nixos/dotfiles/hypr/hyprland.lua";
 
-  xdg.configFile."quickshell/shell.qml".source =
+  # ディレクトリ丸ごと symlink（bar/ 等の分割ファイルも含める）
+  xdg.configFile."quickshell".source =
     config.lib.file.mkOutOfStoreSymlink
-      "${config.home.homeDirectory}/nixos/dotfiles/quickshell/shell.qml";
+      "${config.home.homeDirectory}/nixos/dotfiles/quickshell";
 
   xdg.configFile."kitty/kitty.conf".source =
     config.lib.file.mkOutOfStoreSymlink

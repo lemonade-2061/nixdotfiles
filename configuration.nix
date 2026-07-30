@@ -95,6 +95,20 @@
     };
   };
 
+  # SDDM greeter (Wayland) はテーマ名だけ渡されても探索パスを知らないため、
+  # XCURSOR_PATH をサービス環境に通さないとカーソルが描画されない。
+  systemd.services.display-manager.environment.XCURSOR_PATH =
+    "/run/current-system/sw/share/icons";
+
+  # SDDM テーマ (qylock flake)。The Last of Us Part II テーマを使用。
+  # テーマ本体と必要な QML モジュール (qt5compat/multimedia/svg) は
+  # qylock の NixOS モジュールが sddm.extraPackages に追加してくれる。
+  programs.qylock = {
+    enable = true;
+    theme = "last-of-us";
+    quickshell.enable = false; # SDDM テーマだけ使う（ロック画面は未使用）
+  };
+
   # 既定セッションを「素の Hyprland」に固定する。
   #   programs.hyprland は hyprland.desktop と hyprland-uwsm.desktop の
   #   2つを入れるが、uwsm 版は programs.uwsm.enable が必要で未設定だと
