@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   home.username = "lemonade";
@@ -54,6 +54,9 @@
 
     # ブラウザ
     firefox
+    inputs.zen-browser.packages.${pkgs.system}.default   # Zen Browser (flake input 経由)
+    chromium
+    google-chrome   # Google アカウント同期用（unfree）
 
     # Wayland / Hyprland デスクトップ
     foot
