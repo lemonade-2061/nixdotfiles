@@ -33,6 +33,16 @@
 let
   winEspPartUuid = "906836d3-1ed2-4241-bddd-71c515c86266"; # Windows の ESP (nvme1n1p1, PARTUUID)
 
+  # Visor 用 NixOS アイコン。nixos-icons の PNG は全サイズ 16bit RGBA で、
+  # Visor の PNG デコーダが扱えず緑一色になるため、SVG から upstream 同梱
+  # アイコンと同じ 8bit RGBA / 320x320 でレンダリングし直す。
+  visorNixosIcon = pkgs.runCommand "visor-nixos-icon.png"
+    { nativeBuildInputs = [ pkgs.librsvg ]; } ''
+    rsvg-convert -w 320 -h 320 \
+      ${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg \
+      -o $out
+  '';
+
   # /EFI/visor/boot.conf を生成する。引数で ESP ルートを差し替え可能
   # (テスト用)。デフォルト世代の BLS エントリが読めないときは systemd-boot
   # へのチェインロードにフォールバックする。
@@ -112,8 +122,7 @@ in
   boot.loader.efi.canTouchEfiVariables = true;
 
   boot.loader.systemd-boot.extraFiles = {
-    "EFI/visor/icons/nixos.png" =
-      "${pkgs.nixos-icons}/share/icons/hicolor/128x128/apps/nix-snowflake.png";
+    "EFI/visor/icons/nixos.png" = visorNixosIcon;
   };
 
   # Visor のメニュー (/EFI/visor/boot.conf) をリビルドごとに再生成する。
