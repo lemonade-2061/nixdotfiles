@@ -101,6 +101,17 @@ hl.env("SDL_IM_MODULE", "fcitx")
 ---- LOOK AND FEEL ----
 -----------------------
 
+-- Catppuccin Mocha パレット (https://catppuccin.com/palette)
+local mocha = {
+    mauve    = "cba6f7",
+    lavender = "b4befe",
+    blue     = "89b4fa",
+    surface1 = "45475a",
+    overlay0 = "6c7086",
+    base     = "1e1e2e",
+    crust    = "11111b",
+}
+
 -- Refer to https://wiki.hypr.land/Configuring/Basics/Variables/
 hl.config({
     general = {
@@ -110,8 +121,9 @@ hl.config({
         border_size = 2,
 
         col = {
-            active_border   = "rgba(33ccffee)" ,
-            inactive_border = "rgba(339988ee)",
+            -- アクティブ: mauve → lavender のグラデーション
+            active_border   = { colors = { "rgba(" .. mocha.mauve .. "ee)", "rgba(" .. mocha.lavender .. "ee)" }, angle = 45 },
+            inactive_border = "rgba(" .. mocha.surface1 .. "aa)",
         },
 
         -- Set to true to enable resizing windows by clicking and dragging on borders and gaps
@@ -135,7 +147,7 @@ hl.config({
             enabled      = true,
             range        = 4,
             render_power = 3,
-            color        = 0xee1a1a1a,
+            color        = 0xee11111b, -- mocha.crust
         },
 
         blur = {

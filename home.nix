@@ -92,9 +92,11 @@
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nixos/dotfiles/quickshell";
 
-  xdg.configFile."kitty/kitty.conf".source =
+  # kitty もディレクトリ丸ごと symlink（kitten themes が書く
+  # current-theme.conf 等も dotfiles/kitty に入り git 管理できる）
+  xdg.configFile."kitty".source =
     config.lib.file.mkOutOfStoreSymlink
-      "${config.home.homeDirectory}/nixos/dotfiles/kitty/kitty.conf";
+      "${config.home.homeDirectory}/nixos/dotfiles/kitty";
 
   # Neovim (LazyVim) を丸ごと symlink。lazy-lock.json 等の書き込みも
   # そのまま ~/nixos/dotfiles/nvim に反映され git 管理できる。
@@ -110,6 +112,7 @@
       nrs = "sudo nixos-rebuild switch --flake /home/lemonade/nixos#nixos";
       nrl = "nixos-rebuild list-generations";
       "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
+      lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
     };
   };
 
@@ -128,18 +131,20 @@
       nrs = "sudo nixos-rebuild switch --flake /home/lemonade/nixos#nixos";
       nrl = "nixos-rebuild list-generations";
       "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
+      lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
     };
   };
 
   # starship: クロスシェルプロンプト。zsh 連携は既定で有効。
-  # 初期設定は最小限（デフォルトプロンプト + 改行なし）。
+  # settings は使わず dotfiles/starship/starship.toml を直接編集する
+  # （Rosé Pine Moon テーマ + add_newline = false）。
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
-    settings = {
-      add_newline = false;
-    };
   };
+  xdg.configFile."starship.toml".source =
+    config.lib.file.mkOutOfStoreSymlink
+      "${config.home.homeDirectory}/nixos/dotfiles/starship/starship.toml";
 
   programs.home-manager.enable = true;
 }
