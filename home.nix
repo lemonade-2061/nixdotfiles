@@ -133,6 +133,24 @@
       "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
       lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
     };
+
+    # 金沢工大の学内 Wi-Fi (KIT-WLAP2) は学外通信にプロキシ必須。
+    # シェル起動時に接続中なら自動で環境変数をセットする。
+    # Wi-Fi を途中で切り替えたシェルでは kit-proxy-on / kit-proxy-off で手動切替。
+    initContent = ''
+      kit-proxy-on() {
+        export http_proxy=http://wwwproxy-a10.kanazawa-it.ac.jp:8080
+        export https_proxy=$http_proxy HTTP_PROXY=$http_proxy HTTPS_PROXY=$http_proxy
+        export no_proxy=localhost,127.0.0.1,.kanazawa-it.ac.jp
+        export NO_PROXY=$no_proxy
+      }
+      kit-proxy-off() {
+        unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY no_proxy NO_PROXY
+      }
+      if nmcli -t -f NAME connection show --active 2>/dev/null | grep -qx 'KIT-WLAP2'; then
+        kit-proxy-on
+      fi
+    '';
   };
 
   # starship: クロスシェルプロンプト。zsh 連携は既定で有効。
