@@ -13,7 +13,7 @@ Text {
   property int vol: audio ? Math.round(audio.volume * 100) : 0
   property bool muted: audio ? audio.muted : false
 
-  color: muted ? "#888888" : "#ffffff"
+  color: muted ? "#ffffff" : "#ffffff"
 
   property string icon: muted ? "\u{f075f}"
                       : vol >= 66 ? "\u{f057e}"

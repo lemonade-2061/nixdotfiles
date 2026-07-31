@@ -22,7 +22,7 @@ Scope {
                 right: true
             }
             implicitHeight: 32
-            color: "#1a1a1aee"
+            color: "#77889eaf"
 
             // --- 左: ワークスペース ---
             Workspace{}
