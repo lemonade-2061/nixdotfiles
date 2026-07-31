@@ -1,11 +1,14 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
+# プロンプト前の空行なし
+add_newline = false
+
 format = """
+ \
 $username\
 $directory\
 $git_branch\
 $git_status\
-$fill\
 $c\
 $elixir\
 $elm\
@@ -37,7 +40,8 @@ iris = '#c4a7e7'
 [directory]
 format = "[](fg:overlay)[ $path ]($style)[](fg:overlay) "
 style = "bg:overlay fg:pine"
-truncation_length = 3
+# 折り返し（プロンプト複製の原因）を防ぐため表示は末尾2階層まで
+truncation_length = 2
 truncation_symbol = "…/"
 
 [directory.substitutions]
@@ -46,13 +50,11 @@ Downloads = " "
 Music = " "
 Pictures = " "
 
-[fill]
-style = "fg:overlay"
-symbol = " "
-
 [git_branch]
 format = "[](fg:overlay)[ $symbol $branch ]($style)[](fg:overlay) "
 style = "bg:overlay fg:foam"
+# 長いブランチ名で折り返さないよう20文字で切る
+truncation_length = 20
 symbol = ""
 
 [git_status]
@@ -163,6 +165,3 @@ style = "bg:overlay fg:pine"
 format = " [](fg:overlay)[ $symbol$environment ]($style)[](fg:overlay)"
 disabled = false
 symbol = '🅒 '
-
-# 既存設定の引き継ぎ: プロンプト前の空行なし
-add_newline = false
