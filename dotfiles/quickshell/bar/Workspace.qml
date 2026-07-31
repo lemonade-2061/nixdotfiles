@@ -22,7 +22,7 @@ Row {
         anchors.centerIn: parent
         text: modelData.name
         color: modelData.focused ? "#000000" : "#cccccc"
-        font.pixelSize: 12
+        font.pixelSize: 13
         font.bold: modelData.focused
       }
 

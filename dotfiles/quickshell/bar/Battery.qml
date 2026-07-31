@@ -3,7 +3,7 @@ import Quickshell.Io
 
 Text {
   anchors.verticalCenter: parent.verticalCenter
-  font.pixelSize: 12
+  font.pixelSize: 13
   font.bold: true
   font.family: "JetBrainsMono Nerd Font"
 
