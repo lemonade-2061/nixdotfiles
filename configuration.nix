@@ -78,10 +78,24 @@
 
   programs.hyprland.enable = true;
 
+  # コンテナ環境: rootless Podman + Docker 互換レイヤ。
+  # ハッカソン用リポジトリ (~/hackathon) を docker compose で動かすため。
+  # - dockerCompat: `docker` コマンドを podman のエイリアスとして提供
+  # - rootless の subuid/subgid は users.users 側で自動設定済み (/etc/subuid)
+  # - `docker compose` / `podman compose` は外部の docker-compose を実体として呼び出し、
+  #   その際 rootless ソケットへの DOCKER_HOST は podman が自動設定する
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    # compose が作るネットワークでサービス名の DNS 解決 (backend→db 等) を有効にする
+    defaultNetwork.settings.dns_enabled = true;
+  };
+
   # カーソルテーマ（Bibata: 丸っこい三角形）。SDDM が探せるよう
   # システム側にも入れておく（/run/current-system/sw/share/icons）。
   environment.systemPackages = with pkgs; [
     bibata-cursors
+    docker-compose # `docker compose` / `podman compose` の実体 (compose v2)
   ];
 
   # SDDM ログイン画面（Wayland セッションで Hyprland を起動）

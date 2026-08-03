@@ -27,6 +27,7 @@
     sd
     ripgrep
     cava
+    awscli2      # AWS CLI v2
     # starship は programs.starship 側で管理（下部参照）
 
     # エディタ補助（フォーマッタ / 検索 / ゴミ箱）
