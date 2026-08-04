@@ -109,6 +109,11 @@
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nixos/dotfiles/nvim";
 
+  # fastfetch: config.jsonc を直接編集すれば次回実行から即反映
+  xdg.configFile."fastfetch".source =
+    config.lib.file.mkOutOfStoreSymlink
+      "${config.home.homeDirectory}/nixos/dotfiles/fastfetch";
+
   # 共通エイリアス（bash / zsh 両方に流し込む）
   # bash はフォールバック用に残しておく。
   programs.bash = {
