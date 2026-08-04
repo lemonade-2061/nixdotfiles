@@ -83,10 +83,10 @@
     x11.enable = true;
   };
 
-  # dotfiles symlink
-  xdg.configFile."hypr/hyprland.lua".source =
+  # dotfiles symlink（ディレクトリ丸ごと — binds.lua 等の分割ファイルも含める）
+  xdg.configFile."hypr".source =
     config.lib.file.mkOutOfStoreSymlink
-      "${config.home.homeDirectory}/nixos/dotfiles/hypr/hyprland.lua";
+      "${config.home.homeDirectory}/nixos/dotfiles/hypr";
 
   # ディレクトリ丸ごと symlink（bar/ 等の分割ファイルも含める）
   xdg.configFile."quickshell".source =
