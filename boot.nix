@@ -76,7 +76,7 @@ let
 timeout=5
 default=0
 snapshots=0
-background=\EFI\visor\backgrounds\default.png
+background=\EFI\visor\backgrounds\bg4.png
 EOF
       if [ -n "$kernel" ] && [ -n "$initrd" ]; then
         printf '\nentry {\n'
@@ -123,6 +123,8 @@ in
 
   boot.loader.systemd-boot.extraFiles = {
     "EFI/visor/icons/nixos.png" = visorNixosIcon;
+    # Visor の背景 (upstream assets/backgrounds/bg4.png のコピー)
+    "EFI/visor/backgrounds/bg4.png" = ./assets/visor-bg4.png;
   };
 
   # Visor のメニュー (/EFI/visor/boot.conf) をリビルドごとに再生成する。

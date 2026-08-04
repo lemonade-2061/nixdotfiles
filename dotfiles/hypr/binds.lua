@@ -11,6 +11,7 @@ hl.bind(mainMod .. " + return", hl.dsp.exec_cmd(p.terminal))
 local closeWindowBind = hl.bind(mainMod .. " + Q", hl.dsp.window.close()) -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(p.fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + space", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + C", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(p.menu))          -- アプリランチャー (fuzzel)

@@ -34,6 +34,7 @@ hl.monitor({
 hl.on("hyprland.start", function ()
     hl.exec_cmd("fcitx5 --replace -d")  -- 日本語入力
     hl.exec_cmd("qs")                   -- Quickshell バー
+    hl.exec_cmd("awww-daemon")          -- 壁紙デーモン (swww後継、パッケージ名はswwwのまま)
 end)
 
 

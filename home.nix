@@ -32,6 +32,7 @@
     cargo
     rustfmt
     clippy
+    cmatrix
     # starship は programs.starship 側で管理（下部参照）
 
     # エディタ補助（フォーマッタ / 検索 / ゴミ箱）
@@ -63,6 +64,9 @@
     chromium
     google-chrome   # Google アカウント同期用（unfree）
 
+    # ソフト
+    spotify
+
     # Wayland / Hyprland デスクトップ
     foot
     kitty
@@ -75,6 +79,7 @@
     hyprshot
     satty
     shikane
+    swww          # 壁紙デーモン（中身はawww: awww img <画像> で切り替え）
   ];
 
   # カーソルテーマ（Bibata-Modern-Classic）。
