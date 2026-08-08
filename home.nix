@@ -65,7 +65,16 @@
     google-chrome   # Google アカウント同期用（unfree）
 
     # ソフト
-    spotify
+    # XWayland だとスケール1.5でぼやけるのでネイティブ Wayland で起動
+    (symlinkJoin {
+      name = "spotify-wayland";
+      paths = [ spotify ];
+      nativeBuildInputs = [ makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/spotify \
+          --add-flags "--enable-features=UseOzonePlatform --ozone-platform=wayland"
+      '';
+    })
 
     # Wayland / Hyprland デスクトップ
     foot

@@ -15,6 +15,15 @@
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
+  # 圧縮スワップ (zram) — RAMの50%をzstd圧縮のswapとして使う
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+  };
+  # zramがあるうちは積極的にswapさせる (圧縮なので安価)
+  boot.kernel.sysctl."vm.swappiness" = 180;
+
   networking.hostName = "nixos"; # Define your hostname.
 
   # Configure network connections interactively with nmcli or nmtui.

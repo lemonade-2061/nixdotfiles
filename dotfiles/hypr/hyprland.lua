@@ -6,7 +6,7 @@
 
 -- 分割ファイル:
 --   programs.lua   … 共有プログラム変数 (binds.lua から require)
---   theme.lua      … Catppuccin パレット + general/decoration
+--   theme.lua      … グレーブルーパレット + general/decoration
 --   animations.lua … カーブ + アニメーション定義
 --   binds.lua      … キーバインド
 --   rules.lua      … ウィンドウルール
@@ -48,10 +48,11 @@ hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
 
 -- 日本語入力 (fcitx5) 用の入力メソッド環境変数
-hl.env("GTK_IM_MODULE", "fcitx")
-hl.env("QT_IM_MODULE", "fcitx")
-hl.env("XMODIFIERS", "@im=fcitx")
-hl.env("SDL_IM_MODULE", "fcitx")
+-- waylandFrontend = true なので GTK/Qt は text-input-v3 経由で入力する。
+-- GTK_IM_MODULE / QT_IM_MODULE を設定すると D-Bus モジュール経由になり、
+-- Firefox 等で候補ウィンドウの位置ずれ・確定不能が起きるため設定しない。
+hl.env("XMODIFIERS", "@im=fcitx")   -- XWayland アプリ用
+hl.env("SDL_IM_MODULE", "fcitx")    -- SDL は text-input 非対応
 
 
 -----------------------

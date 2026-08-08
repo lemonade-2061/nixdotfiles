@@ -2,15 +2,15 @@
 ---- LOOK AND FEEL ----
 -----------------------
 
--- Catppuccin Mocha パレット (https://catppuccin.com/palette)
-local mocha = {
-    mauve    = "cba6f7",
-    lavender = "b4befe",
-    blue     = "89b4fa",
-    surface1 = "45475a",
-    overlay0 = "6c7086",
-    base     = "1e1e2e",
-    crust    = "11111b",
+-- グレー寄りの青パレット (Nord 風)
+local palette = {
+    blue     = "81a1c1", -- くすんだ青
+    frost    = "a3b8d8", -- 明るめのグレーブルー
+    steel    = "5e81ac", -- 濃いめのスチールブルー
+    surface1 = "434c5e",
+    overlay0 = "6c7689",
+    base     = "20242e",
+    crust    = "14171f",
 }
 
 -- Refer to https://wiki.hypr.land/Configuring/Basics/Variables/
@@ -22,9 +22,9 @@ hl.config({
         border_size = 2,
 
         col = {
-            -- アクティブ: mauve → lavender のグラデーション
-            active_border   = { colors = { "rgba(" .. mocha.mauve .. "ee)", "rgba(" .. mocha.lavender .. "ee)" }, angle = 45 },
-            inactive_border = "rgba(" .. mocha.surface1 .. "aa)",
+            -- アクティブ: くすんだ青 → 明るいグレーブルー のグラデーション
+            active_border   = { colors = { "rgba(" .. palette.blue .. "ee)", "rgba(" .. palette.frost .. "ee)" }, angle = 45 },
+            inactive_border = "rgba(" .. palette.surface1 .. "aa)",
         },
 
         -- Set to true to enable resizing windows by clicking and dragging on borders and gaps
@@ -48,7 +48,7 @@ hl.config({
             enabled      = true,
             range        = 4,
             render_power = 3,
-            color        = 0xee11111b, -- mocha.crust
+            color        = 0xee14171f, -- palette.crust
         },
 
         blur = {
@@ -60,4 +60,4 @@ hl.config({
     },
 })
 
-return mocha
+return palette

@@ -19,7 +19,7 @@ Text {
   property string st: batStatus.text().trim()
   property bool charging: st === "Charging" || st === "Full"
 
-  color: charging ? "#7bd88f" : (pct <= 15 ? "#ff5555" : (pct <= 30 ? "#f1fa8c" : "#cccccc"))
+  color: charging ? "#7ebae4" : (pct <= 15 ? "#ff5555" : (pct <= 30 ? "#f1fa8c" : "#ffffff"))
 
   property string icon: pct >= 90 ? ""
                       : pct >= 70 ? ""
