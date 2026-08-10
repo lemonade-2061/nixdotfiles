@@ -4,6 +4,7 @@ import Quickshell.Services.Pipewire
 import QtQuick
 import "./bar"
 import "./wallpaper"
+import "./notifications"
 
 Scope {
     // 既定オーディオシンクをバインド（音量の読み書きに必須）
@@ -11,6 +12,10 @@ Scope {
 
     // 壁紙ピッカー (super+W → qs ipc call wallpaper toggle)
     WallpaperPicker {}
+
+    // 通知デーモン (org.freedesktop.Notifications) + 右上トースト
+    NotificationDaemon { id: notifDaemon }
+    NotificationPopups { daemon: notifDaemon }
 
     // 1 バーを全モニターに出す
     Variants {
@@ -57,7 +62,7 @@ Scope {
                 Media {
                     maxWidth: Math.max(60,
                         (rightRow.parent.width - clock.width) / 2
-                        - sysPill.width - cc.width - rightRow.spacing * 2
+                        - sysPill.width - bell.width - cc.width - rightRow.spacing * 3
                         - rightRow.anchors.rightMargin - 16)
                 }
 
@@ -79,6 +84,9 @@ Scope {
                         Battery{}
                     }
                 }
+
+                // 通知センター (super+N → qs ipc call notifications toggle)
+                NotificationBell{ id: bell; daemon: notifDaemon }
 
                 ControlCenter{ id: cc }
             }

@@ -33,6 +33,12 @@
     rustfmt
     clippy
     cmatrix
+    jq           # JSON 加工
+    unzip
+    p7zip
+    nvd          # 世代間の差分表示 (nvd diff /run/current-system result)
+    nix-output-monitor # nom: ビルドログをツリー表示
+    nh           # nixos-rebuild ラッパー (nh os switch ~/nixos)
     # starship は programs.starship 側で管理（下部参照）
 
     # エディタ補助（フォーマッタ / 検索 / ゴミ箱）
@@ -56,6 +62,12 @@
     ghostscript   # gs（PDF）
     tectonic      # LaTeX 数式
     mermaid-cli   # mmdc（Mermaid 図）
+
+    # ビューア / ファイルマネージャ
+    mpv           # 動画
+    imv           # 画像
+    zathura       # PDF
+    yazi          # TUI ファイルマネージャ
 
 
     # ブラウザ
@@ -89,6 +101,9 @@
     satty
     shikane
     swww          # 壁紙デーモン（中身はawww: awww img <画像> で切り替え）
+    pavucontrol   # 音量・出力先切替 GUI
+    cliphist      # クリップボード履歴 (Super+SHIFT+V で fuzzel ピッカー)
+    libnotify     # notify-send (通知はquickshellのNotificationDaemonが受ける)
   ];
 
   # カーソルテーマ（Bibata-Modern-Classic）。
@@ -162,6 +177,16 @@
     # シェル起動時に接続中なら自動で環境変数をセットする。
     # Wi-Fi を途中で切り替えたシェルでは kit-proxy-on / kit-proxy-off で手動切替。
     initContent = ''
+      # kitty shell integration (OSC 133 プロンプトマーク) の手動ロード。
+      # これが無いとリサイズで折り返したプロンプトを kitty が消去できず、
+      # 同じ行が下に複製される (starship のバグではなく統合未ロードが原因)。
+      if [[ -n "$KITTY_INSTALLATION_DIR" ]]; then
+        export KITTY_SHELL_INTEGRATION="no-rc"
+        autoload -Uz -- "$KITTY_INSTALLATION_DIR"/shell-integration/zsh/kitty-integration
+        kitty-integration
+        unfunction kitty-integration
+      fi
+
       kit-proxy-on() {
         export http_proxy=http://wwwproxy-a10.kanazawa-it.ac.jp:8080
         export https_proxy=$http_proxy HTTP_PROXY=$http_proxy HTTPS_PROXY=$http_proxy
@@ -187,6 +212,42 @@
   xdg.configFile."starship.toml".source =
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nixos/dotfiles/starship/starship.toml";
+
+  # zoxide: cd の学習型ジャンプ (z <dir>)。zsh 連携は既定で有効。
+  programs.zoxide.enable = true;
+
+  # direnv + nix-direnv: プロジェクトの .envrc (`use flake` 等) で
+  # dev shell を自動ロード。nix-direnv 側は評価結果をキャッシュする。
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
+  # 通知デーモンは quickshell が実装 (dotfiles/quickshell/notifications/)。
+  # mako 等を有効にすると org.freedesktop.Notifications を取り合うので入れない。
+
+  # USB 自動マウント（udisks2 は configuration.nix 側で有効化）。
+  # バーに SNI トレイがないので tray は切っておく。
+  services.udiskie = {
+    enable = true;
+    tray = "never";
+  };
+
+  # polkit 認証エージェント。GUI からの管理者権限要求のダイアログ担当。
+  # パッケージは bin/ を持たず libexec 配下のみなので直接パスを指定。
+  systemd.user.services.hyprpolkitagent = {
+    Unit = {
+      Description = "Hyprland polkit authentication agent";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      ExecStart = "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent";
+      Restart = "on-failure";
+      RestartSec = 2;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
 
   programs.home-manager.enable = true;
 }

@@ -37,9 +37,11 @@ hl.bind(mainMod .. " + SHIFT + K",    hl.dsp.window.swap({ direction = "u" }))
 hl.bind(mainMod .. " + SHIFT + J",  hl.dsp.window.swap({ direction = "d" }))
 
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle")) -- 壁紙ピッカー
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle")) -- 通知センター
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("hyprshot -m region --clipboard-only"))
 hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd("hyprshot -m window -o ~/Pictures"))
 hl.bind(mainMod .. " + SHIFT + U", hl.dsp.exec_cmd("hyprshot -m output -o ~/Pictures")) -- 全画面スクショ
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("sh -c 'cliphist list | fuzzel --dmenu | cliphist decode | wl-copy'")) -- クリップボード履歴
 
 
 -- Switch workspaces with mainMod + [0-9]

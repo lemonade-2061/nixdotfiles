@@ -142,4 +142,7 @@
     enable = true;
     pulse.enable = true;
   };
+
+  # USB 等の自動マウント基盤（フロントエンドは home.nix の udiskie）
+  services.udisks2.enable = true;
 }
