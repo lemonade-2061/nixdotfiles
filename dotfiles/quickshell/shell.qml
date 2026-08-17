@@ -42,7 +42,7 @@ Scope {
 
                 NixLauncher{}
 
-                Workspace{}
+                Workspace{ monitorName: modelData.name }
 
                 Stats{}
             }

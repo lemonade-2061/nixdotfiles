@@ -47,6 +47,11 @@
     fzf           # LazyVim / picker
     ast-grep      # grug-far の拡張検索
     trash-cli     # snacks explorer で安全な削除 (trash コマンド)
+    prettier      # prettier extra (conform)
+    black         # Python フォーマッタ (black extra)
+    tree-sitter   # nvim-treesitter main ブランチのパーサーコンパイルに必須
+    sqlite        # snacks picker の frecency / 履歴保存
+    python3
 
     # LSP（言語サーバは nix 側で管理。Mason は NixOS では使わない）
     lua-language-server
@@ -104,6 +109,8 @@
     pavucontrol   # 音量・出力先切替 GUI
     cliphist      # クリップボード履歴 (Super+SHIFT+V で fuzzel ピッカー)
     libnotify     # notify-send (通知はquickshellのNotificationDaemonが受ける)
+    obs-studio    # 配信・録画 (画面キャプチャはxdg-desktop-portal経由)
+    brightnessctl # 輝度キー (XF86MonBrightness*) 用
   ];
 
   # カーソルテーマ（Bibata-Modern-Classic）。
@@ -152,6 +159,7 @@
       nrl = "nixos-rebuild list-generations";
       "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
       lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
+      clear = "printf '\\033[2J\\033[3J\\033[H'";
     };
   };
 
@@ -171,6 +179,8 @@
       nrl = "nixos-rebuild list-generations";
       "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
       lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
+      # 画面クリア後にスクロールバックも消す (2J=画面 3J=履歴 H=カーソル復帰)
+      clear = "printf '\\033[2J\\033[3J\\033[H'";
     };
 
     # 金沢工大の学内 Wi-Fi (KIT-WLAP2) は学外通信にプロキシ必須。

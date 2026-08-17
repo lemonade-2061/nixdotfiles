@@ -3,7 +3,7 @@ import QtQuick.Effects
 import QtQuick.Shapes
 import Quickshell
 import Quickshell.Io
-import Quickshell.Hyprland
+import "../shoji"
 import Quickshell.Services.Mpris
 
 // Spotify (MPRIS) ナウプレイング + クリックでプレイヤーポップアップ
@@ -124,6 +124,10 @@ Item {
     anchor.item: root
     anchor.edges: Edges.Bottom
     anchor.gravity: Edges.Bottom
+    // 画面右端からはみ出さないようクランプ (Shoji.popupShiftX 参照)
+    anchor.rect.x: popup.visible
+      ? Shoji.popupShiftX(root, root.QsWindow.window, popup.implicitWidth)
+      : 0
     implicitWidth: 290
     implicitHeight: panel.height + 16
     color: "transparent"
@@ -375,7 +379,7 @@ Item {
     function toggle(): void { popup.visible = !popup.visible }
   }
 
-  HyprlandFocusGrab {
+  PopupGrab {
     active: popup.visible
     windows: [popup]
     onCleared: popup.visible = false

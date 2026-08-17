@@ -1,10 +1,14 @@
 import QtQuick
 import Quickshell.Hyprland
+import "../shoji"
 
 // ワークスペースインジケーター
 // フォーカス中はピル状に伸びて番号を表示、他は小さなドット。
 // special workspace (super+S の magic, id<0) は通常の列に混ぜず、
-// 存在するときだけ右端に杖アイコンで表示する。
+// 存在するときだけ右端に杖アイコンで表示する (Hyprland のみ。ShojiWM に
+// special workspace は無い)。
+// ShojiWM では Shoji アダプタ (IPC ソケット) から自モニターの
+// ワークスペース一覧を取り、Hyprland では従来通り Hyprland シングルトンを使う。
 // 色は theme.lua のグレーブルーパレットに合わせる。
 Rectangle {
   id: root
@@ -14,8 +18,31 @@ Rectangle {
   radius: height / 2
   color: "#5514171f"
 
+  // バー (shell.qml) から自スクリーン名をもらう (ShojiWM 用)
+  property string monitorName: ""
+
   readonly property var specialWs:
-    Hyprland.workspaces.values.find(w => w.id < 0) ?? null
+    Shoji.active ? null
+                 : (Hyprland.workspaces.values.find(w => w.id < 0) ?? null)
+
+  // どちらのコンポジタでも {id, name, focused, urgent} に正規化する
+  readonly property var wsModel:
+    Shoji.active
+      ? Shoji.monitorWorkspaces(root.monitorName)
+          .map(w => ({ id: w.index, name: String(w.index),
+                       focused: w.active, urgent: false }))
+      : Hyprland.workspaces.values
+          .filter(w => w.id > 0)
+          .sort((a, b) => a.id - b.id)
+          .map(w => ({ id: w.id, name: w.name,
+                       focused: w.focused, urgent: w.urgent }))
+
+  function focusWorkspace(id) {
+    if (Shoji.active)
+      Shoji.activate(root.monitorName, id)
+    else
+      Hyprland.dispatch("hl.dsp.focus({workspace=" + id + "})")
+  }
 
   Row {
     id: row
@@ -23,9 +50,7 @@ Rectangle {
     spacing: 6
 
     Repeater {
-      model: Hyprland.workspaces.values
-               .filter(w => w.id > 0)
-               .sort((a, b) => a.id - b.id)
+      model: root.wsModel
 
       Rectangle {
         id: ws
@@ -59,7 +84,7 @@ Rectangle {
           id: ma
           anchors.fill: parent
           hoverEnabled: true
-          onClicked: Hyprland.dispatch("hl.dsp.focus({workspace=" + ws.modelData.id + "})")
+          onClicked: root.focusWorkspace(ws.modelData.id)
         }
       }
     }
@@ -81,7 +106,7 @@ Rectangle {
 
       Text {
         anchors.centerIn: parent
-        text: ""  // nf-fa-magic
+        text: ""  // nf-fa-magic
         color: special.focused ? "#14171f" : "#d2d9e8"
         opacity: special.focused ? 1.0 : 0.7
         font.pixelSize: 9

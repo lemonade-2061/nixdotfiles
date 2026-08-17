@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import "../shoji"
 
 // 壁紙ピッカー
 // super+W (binds.lua) → `qs ipc call wallpaper toggle` で開閉。
@@ -23,9 +24,11 @@ Scope {
       win.visible = false
       return
     }
-    // フォーカス中のモニターに出す
-    const mon = Hyprland.focusedMonitor
-    const scr = Quickshell.screens.find(s => s.name === (mon ? mon.name : "")) ?? null
+    // フォーカス中のモニターに出す (ShojiWM は IPC view の currentMonitor)
+    const monName = Shoji.active
+      ? (Shoji.view.currentMonitor ?? "")
+      : (Hyprland.focusedMonitor ? Hyprland.focusedMonitor.name : "")
+    const scr = Quickshell.screens.find(s => s.name === monName) ?? null
     if (scr !== null)
       win.screen = scr
     queryProc.running = true

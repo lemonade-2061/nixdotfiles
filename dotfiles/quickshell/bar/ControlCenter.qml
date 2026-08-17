@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
-import Quickshell.Hyprland
+import "../shoji"
 import Quickshell.Services.Pipewire
 
 // コントロールセンター: バー右端の  ボタン → ポップアップ
@@ -239,6 +239,10 @@ Item {
     anchor.item: root
     anchor.edges: Edges.Bottom
     anchor.gravity: Edges.Bottom
+    // 右端のボタンなので中央寄せだと画面外へはみ出す → 画面内にクランプ
+    anchor.rect.x: popup.visible
+      ? Shoji.popupShiftX(root, root.QsWindow.window, popup.implicitWidth)
+      : 0
     implicitWidth: 290
     implicitHeight: panel.height + 16
     color: "transparent"
@@ -404,7 +408,7 @@ Item {
     function toggle(): void { root.togglePopup() }
   }
 
-  HyprlandFocusGrab {
+  PopupGrab {
     active: popup.visible
     windows: [popup]
     onCleared: popup.visible = false

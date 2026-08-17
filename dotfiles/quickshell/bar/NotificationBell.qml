@@ -1,6 +1,6 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
+import "../shoji"
 
 // 通知センター: ベルアイコン + 件数バッジ → 通知一覧ポップアップ
 // Super+N (qs ipc call notifications toggle) でも開閉できる
@@ -81,6 +81,10 @@ Item {
     anchor.item: root
     anchor.edges: Edges.Bottom
     anchor.gravity: Edges.Bottom
+    // 画面右端からはみ出さないようクランプ (Shoji.popupShiftX 参照)
+    anchor.rect.x: popup.visible
+      ? Shoji.popupShiftX(root, root.QsWindow.window, popup.implicitWidth)
+      : 0
     implicitWidth: 340
     implicitHeight: panel.height + 16
     color: "transparent"
@@ -338,7 +342,7 @@ Item {
     }
   }
 
-  HyprlandFocusGrab {
+  PopupGrab {
     active: popup.visible
     windows: [popup]
     onCleared: popup.visible = false

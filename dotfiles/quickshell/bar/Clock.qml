@@ -1,9 +1,9 @@
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
+import "../shoji"
 
 // 時計 + クリックでカレンダーポップアップ
-// カレンダーは自前QML描画。外側クリック(HyprlandFocusGrab)で閉じる。
+// カレンダーは自前QML描画。外側クリック(PopupGrab; Hyprlandのみ)で閉じる。
 Item {
   id: root
   anchors.centerIn: parent
@@ -236,7 +236,7 @@ Item {
     }
   }
 
-  HyprlandFocusGrab {
+  PopupGrab {
     active: popup.visible
     windows: [popup]
     onCleared: popup.visible = false

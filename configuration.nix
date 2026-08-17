@@ -120,8 +120,15 @@
 
   # SDDM greeter (Wayland) はテーマ名だけ渡されても探索パスを知らないため、
   # XCURSOR_PATH をサービス環境に通さないとカーソルが描画されない。
-  systemd.services.display-manager.environment.XCURSOR_PATH =
-    "/run/current-system/sw/share/icons";
+  # さらに Qt6.7+ は cursor-shape-v1 プロトコルでカーソル描画をコンポジタ
+  # (weston) に任せるが、settings.Theme.CursorTheme は greeter にしか
+  # 渡らない。weston は既定の "default" テーマを探して失敗し非表示になる
+  # ので、XCURSOR_THEME/SIZE をサービス環境ごと通して weston にも伝える。
+  systemd.services.display-manager.environment = {
+    XCURSOR_PATH = "/run/current-system/sw/share/icons";
+    XCURSOR_THEME = "Bibata-Modern-Classic";
+    XCURSOR_SIZE = "24";
+  };
 
   # SDDM テーマ (qylock flake)。The Last of Us Part II テーマを使用。
   # テーマ本体と必要な QML モジュール (qt5compat/multimedia/svg) は
