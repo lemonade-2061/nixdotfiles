@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    shojiwm.url = "git+file:///home/lemonade/git-clone/ShojiWM";
+    shojiwm.url = "github:bea4dev/ShojiWM";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";

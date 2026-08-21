@@ -22,6 +22,7 @@
     fastfetch
     lolcat
     claude-code
+    codex
     cowsay
     eza
     sd
@@ -39,6 +40,7 @@
     nvd          # 世代間の差分表示 (nvd diff /run/current-system result)
     nix-output-monitor # nom: ビルドログをツリー表示
     nh           # nixos-rebuild ラッパー (nh os switch ~/nixos)
+    hyfetch      # neofetch 後継 (素の見た目は neowofetch コマンド)
     # starship は programs.starship 側で管理（下部参照）
 
     # エディタ補助（フォーマッタ / 検索 / ゴミ箱）
@@ -149,6 +151,12 @@
   xdg.configFile."fastfetch".source =
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nixos/dotfiles/fastfetch";
+
+  # 既定エディタを nvim に（git commit / crontab -e 等もこれを見る）
+  home.sessionVariables = {
+    EDITOR = "nvim";
+    VISUAL = "nvim";
+  };
 
   # 共通エイリアス（bash / zsh 両方に流し込む）
   # bash はフォールバック用に残しておく。

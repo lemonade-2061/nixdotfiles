@@ -111,23 +111,23 @@
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
-    # ログイン画面でカーソルが出ない対策：明示的にテーマを指定する。
+    # グリータ用コンポジタは kwin。既定の weston 15 は drm-backend の
+    # HW カーソルプレーンが AMD 780M で透明表示になるバグがあり、カーソルが
+    # 見えない（ネスト weston + 同一 greeter + 同一 env では正常表示を実験で
+    # 確認済み → クライアント側ではなく weston の合成が原因）。
+    wayland.compositor = "kwin";
+    # Theme.CursorTheme/CursorSize は daemon が XCURSOR_THEME/SIZE として
+    # greeter 環境に注入する。xcursor の既定探索パス（~/.icons 等）は
+    # sddm ユーザーでは全て空なので XCURSOR_PATH を明示。
     settings.Theme = {
       CursorTheme = "Bibata-Modern-Classic";
       CursorSize = 24;
     };
-  };
-
-  # SDDM greeter (Wayland) はテーマ名だけ渡されても探索パスを知らないため、
-  # XCURSOR_PATH をサービス環境に通さないとカーソルが描画されない。
-  # さらに Qt6.7+ は cursor-shape-v1 プロトコルでカーソル描画をコンポジタ
-  # (weston) に任せるが、settings.Theme.CursorTheme は greeter にしか
-  # 渡らない。weston は既定の "default" テーマを探して失敗し非表示になる
-  # ので、XCURSOR_THEME/SIZE をサービス環境ごと通して weston にも伝える。
-  systemd.services.display-manager.environment = {
-    XCURSOR_PATH = "/run/current-system/sw/share/icons";
-    XCURSOR_THEME = "Bibata-Modern-Classic";
-    XCURSOR_SIZE = "24";
+    # この行はモジュールが kwin 選択時に入れる既定の GreeterEnvironment
+    # （QT_WAYLAND_SHELL_INTEGRATION=layer-shell）を丸ごと上書きするため、
+    # layer-shell も自分で併記する。XDG_DATA_DIRS は kwin 自身の
+    # カーソルテーマ探索用（kwin は XCURSOR_PATH ではなく XDG を見る）。
+    settings.General.GreeterEnvironment = "QT_WAYLAND_SHELL_INTEGRATION=layer-shell,XCURSOR_PATH=/run/current-system/sw/share/icons,XDG_DATA_DIRS=/run/current-system/sw/share";
   };
 
   # SDDM テーマ (qylock flake)。The Last of Us Part II テーマを使用。
