@@ -94,6 +94,8 @@
           --add-flags "--enable-features=UseOzonePlatform --ozone-platform=wayland"
       '';
     })
+    blender
+    zoom-us
 
     # Wayland / Hyprland デスクトップ
     foot
