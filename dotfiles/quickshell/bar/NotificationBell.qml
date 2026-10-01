@@ -16,7 +16,13 @@ Item {
     function onTogglePanel() { root.togglePopup() }
   }
 
+  // 開く瞬間に一度だけ計算して固定する。visible に連動したバインドだと
+  // 閉じる瞬間に x=0 へ再配置が走り、unmap と競合して描画が残る
+  property real popupShift: 0
+
   function togglePopup() {
+    if (!popup.visible)
+      popupShift = Shoji.popupShiftX(root, root.QsWindow.window, popup.implicitWidth)
     popup.visible = !popup.visible
   }
 
@@ -82,9 +88,12 @@ Item {
     anchor.edges: Edges.Bottom
     anchor.gravity: Edges.Bottom
     // 画面右端からはみ出さないようクランプ (Shoji.popupShiftX 参照)
-    anchor.rect.x: popup.visible
-      ? Shoji.popupShiftX(root, root.QsWindow.window, popup.implicitWidth)
-      : 0
+    // rect.x だけ上書きするとデフォルトのアイテム矩形が捨てられ、幅0高さ0の
+    // 矩形がアイテム上端に置かれる → ポップアップがバーに重なりベルを覆って
+    // クリックを吸い、閉じられなくなる。幅と高さも明示して下端アンカーを保つ
+    anchor.rect.x: root.popupShift
+    anchor.rect.width: root.width
+    anchor.rect.height: root.height
     implicitWidth: 340
     implicitHeight: panel.height + 16
     color: "transparent"
@@ -342,9 +351,12 @@ Item {
     }
   }
 
+  // バーもグラブ対象に含める: ベルのクリックが「外側クリック」扱いされると
+  // グラブ解除(閉)→同じクリックで再トグル(開)の競合で閉じられなくなる。
+  // バー外のクリックは今まで通り onCleared で閉じる
   PopupGrab {
     active: popup.visible
-    windows: [popup]
+    windows: [root.QsWindow.window, popup]
     onCleared: popup.visible = false
   }
 }

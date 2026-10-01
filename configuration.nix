@@ -10,6 +10,7 @@
       ./hardware-configuration.nix
       ./boot.nix                 # ブートチェーン (Visor / GRUB / systemd-boot)
       ./kit-vpn.nix              # KIT Remote-VPN (openfortivpn) モジュール
+      ./pico.nix                 # RaspberryPi Pico 開発環境 (udev / dialout)
     ];
 
   # Use latest kernel.
@@ -54,6 +55,12 @@
     noto-fonts-color-emoji
     nerd-fonts.jetbrains-mono   # JetBrainsMono + アイコン (kitty/neovim 用)
     nerd-fonts.symbols-only     # 他フォントへアイコンだけ補完 (豆腐対策)
+    # docx の PDF 書き出しでレイアウトを崩さないための実フォント。
+    # 指定フォントが無いと fontconfig が別の字幅のもので代替し、
+    # 行送り・改ページがずれるのが崩れの主因。
+    corefonts     # Times New Roman / Arial / Courier New など MS 標準欧文
+    vista-fonts   # メイリオ / Consolas（unfree, Vista 以降の MS 和文）
+    ipaexfont     # IPAex 明朝・ゴシック（MS 明朝/ゴシックの代替）
   ];
 
   # アイコン欠け(豆腐)を全体で防ぐフォールバック設定
@@ -145,6 +152,21 @@
   #   ログイン後に黒画面で落ちる。TTY と同じ素の Hyprland を使う。
   services.displayManager.defaultSession = "hyprland";
 
+  # ローカルLLM (ollama)。127.0.0.1:11434 で API を提供。
+  # この機種 (8845HS + DDR5-5600 デュアルチャネル ≈90GB/s) はメモリ帯域律速で、
+  # 780M (iGPU) に投げても速度がほぼ変わらないため CPU 実行のまま運用する。
+  # ROCm を試すなら acceleration = "rocm" + rocmOverrideGfx = "11.0.2" を追加。
+  # モデル置き場は /var/lib/ollama (qwen3:30b-a3b で約18GB)。
+  services.ollama = {
+    enable = true;
+    environmentVariables = {
+      # 既定 4096 では長文が入らない。KV キャッシュ分 RAM を食うが 32GB なら許容。
+      OLLAMA_CONTEXT_LENGTH = "16384";
+      # 使い終わったモデルを 5 分で RAM から降ろす (既定値)。常駐させたければ "-1"。
+      OLLAMA_KEEP_ALIVE = "5m";
+    };
+  };
+
   services.pipewire = {
     enable = true;
     pulse.enable = true;
@@ -152,4 +174,7 @@
 
   # USB 等の自動マウント基盤（フロントエンドは home.nix の udiskie）
   services.udisks2.enable = true;
+
+  # メッシュVPN。初回は `sudo tailscale up` でログインが必要。
+  services.tailscale.enable = true;
 }

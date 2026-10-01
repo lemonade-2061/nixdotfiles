@@ -41,6 +41,7 @@
     nix-output-monitor # nom: ビルドログをツリー表示
     nh           # nixos-rebuild ラッパー (nh os switch ~/nixos)
     hyfetch      # neofetch 後継 (素の見た目は neowofetch コマンド)
+    android-tools  # adb / fastboot（udev 権限は configuration.nix の programs.adb.enable 側）
     # starship は programs.starship 側で管理（下部参照）
 
     # エディタ補助（フォーマッタ / 検索 / ゴミ箱）
@@ -96,6 +97,11 @@
     })
     blender
     zoom-us
+    # Word/Excel/PowerPoint 互換オフィス。LibreOffice と違い OOXML を
+    # ネイティブに扱う（内部が Word と同じ docx モデル）ので、docx を
+    # 開いて PDF 書き出ししてもページ送りや表組みが崩れにくい。
+    onlyoffice-desktopeditors
+    # vscode は programs.vscode (vscode-fhs) 側で入れる
 
     # Wayland / Hyprland デスクトップ
     foot
@@ -170,6 +176,7 @@
       "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
       lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
       clear = "printf '\\033[2J\\033[3J\\033[H'";
+      "desktop-ssh" = "ssh -L 6080:localhost:6080 lemonade@100.108.23.90";
     };
   };
 
@@ -191,6 +198,8 @@
       lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
       # 画面クリア後にスクロールバックも消す (2J=画面 3J=履歴 H=カーソル復帰)
       clear = "printf '\\033[2J\\033[3J\\033[H'";
+      # Tailscale 経由でデスクトップ (archlinux) へ。noVNC 用に 6080 をフォワード。
+      "desktop-ssh" = "ssh -L 6080:localhost:6080 lemonade@100.108.23.90";
     };
 
     # 金沢工大の学内 Wi-Fi (KIT-WLAP2) は学外通信にプロキシ必須。
@@ -241,6 +250,53 @@
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
+  };
+
+  # VSCode。中身は Microsoft 公式ビルドだが、素の pkgs.vscode ではなく
+  # FHS 環境で起動する pkgs.vscode-fhs を使う。拡張機能が同梱している
+  # プリビルドバイナリ (cpptools の clangd/gdb、Pico 拡張のツールチェーン等) が
+  # /lib64/ld-linux-x86-64.so.2 を探して動かないのを避けるため。
+  #
+  # Wayland ネイティブで起動したい場合は NIXOS_OZONE_WL=1 が必要
+  # (nixpkgs の wrapper がこれを見て --ozone-platform-hint=auto を足す)。
+  # Electron アプリ全体に効く変更なので、入れるなら home.sessionVariables 側で。
+  programs.vscode = {
+    enable = true;
+    package = pkgs.vscode-fhs;
+
+    # GUI のマーケットプレイスからも拡張を入れられるようにしておく。
+    # nixpkgs に無い拡張 (例: Raspberry Pi Pico) はこちらから入れる。
+    mutableExtensionsDir = true;
+
+    profiles.default = {
+      # nix 側で固定する拡張。GUI 経由で入れたものと共存する。
+      extensions = with pkgs.vscode-extensions; [
+        jnoortheen.nix-ide        # Nix (LSP は nixd を使う。userSettings 参照)
+        rust-lang.rust-analyzer   # Rust
+        ms-python.python          # Python
+        tamasfe.even-better-toml  # TOML (Cargo.toml 等)
+        ms-vscode.cpptools        # C/C++ (pico の C SDK 用)
+        ms-vscode.cmake-tools     # CMake
+        vscodevim.vim             # vim キーバインド
+      ];
+
+      userSettings = {
+        # 言語サーバは home.packages 側で入れたものを PATH 経由で使う。
+        # 拡張機能に自動ダウンロードさせる方式は NixOS では動かない (Mason と同じ理由)。
+        "nix.enableLanguageServer" = true;
+        "nix.serverPath" = "nixd";
+
+        "editor.fontFamily" = "'JetBrainsMono Nerd Font', monospace";
+        "editor.fontLigatures" = true;
+        "terminal.integrated.fontFamily" = "JetBrainsMono Nerd Font";
+        "files.trimTrailingWhitespace" = true;
+        "files.insertFinalNewline" = true;
+      };
+
+      # 更新は nixos-rebuild 側でやるので、アプリ内の更新チェックは切る。
+      enableUpdateCheck = false;
+      enableExtensionUpdateCheck = false;
+    };
   };
 
   # 通知デーモンは quickshell が実装 (dotfiles/quickshell/notifications/)。

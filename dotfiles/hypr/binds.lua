@@ -77,3 +77,21 @@ hl.bind("XF86AudioNext",  hl.dsp.exec_cmd("playerctl next"),       { locked = tr
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPlay",  hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = true })
+
+-- パススルーモード: 上の全キーバインドを一時停止し、Super 込みの全キーを
+-- フォーカス中のアプリに素通しする (noVNC でリモートの WM を操作する用)。
+-- 開始と同じキーでは解除できないバグがあるため解除キーは別にしてある
+-- (hyprwm/Hyprland discussion #14733)。
+hl.bind(mainMod .. " + escape", hl.dsp.submap("passthrough"), { description = "パススルーモード開始" })
+hl.define_submap("passthrough", function()
+    hl.bind(mainMod .. " + SHIFT + escape", hl.dsp.submap("reset"), { description = "パススルーモード解除" })
+end)
+
+-- モードの出入りは画面に出ないと分からないので通知する
+hl.on("keybinds.submap", function(name)
+    if name == "passthrough" then
+        hl.exec_cmd("notify-send 'パススルーモード ON' 'Super+Shift+Escape で解除'")
+    else
+        hl.exec_cmd("notify-send 'パススルーモード OFF' 'キーバインド復帰'")
+    end
+end)
