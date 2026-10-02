@@ -260,6 +260,24 @@
   # Wayland ネイティブで起動したい場合は NIXOS_OZONE_WL=1 が必要
   # (nixpkgs の wrapper がこれを見て --ozone-platform-hint=auto を足す)。
   # Electron アプリ全体に効く変更なので、入れるなら home.sessionVariables 側で。
+  # OnlyOffice は fontconfig を使わず自前で /usr/share/fonts・
+  # /usr/local/share/fonts・~/.fonts を走査する。そのうえで走査時に
+  # シンボリックリンクを読み飛ばすため、フォントが全部 store への
+  # リンクである NixOS では和文が一本も見つからず豆腐になる。
+  # (実測: ~/.fonts に実ファイルを置くと拾われ、リンクだと無視された)
+  #
+  # 対策として実ファイルをコピーしたディレクトリを ~/.fonts に置く。
+  # ディレクトリ自体はリンクでも中身が実ファイルなら走査される。
+  home.file.".fonts".source = pkgs.runCommand "onlyoffice-real-fonts" { } ''
+    mkdir -p $out
+    for d in ${pkgs.noto-fonts-cjk-sans} ${pkgs.noto-fonts-cjk-serif} \
+             ${pkgs.ipaexfont} ${pkgs.corefonts} ${pkgs.vista-fonts}; do
+      find -L "$d/share/fonts" -type f \
+        \( -iname '*.ttf' -o -iname '*.otf' -o -iname '*.ttc' -o -iname '*.otc' \) \
+        -exec cp -Lf -t $out {} +
+    done
+  '';
+
   programs.vscode = {
     enable = true;
     package = pkgs.vscode-fhs;
