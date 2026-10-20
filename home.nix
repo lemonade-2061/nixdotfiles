@@ -54,7 +54,21 @@
     black         # Python フォーマッタ (black extra)
     tree-sitter   # nvim-treesitter main ブランチのパーサーコンパイルに必須
     sqlite        # snacks picker の frecency / 履歴保存
-    python3
+
+    # Python 本体 + よく使うライブラリ。
+    # NixOS ではシステムの Python に pip install できない (store が読み取り専用)
+    # ので、常用するものはここに宣言して入れる。追加したいときはこのリストに
+    # 足して nrs。利用できる名前は: nix search nixpkgs#python3Packages.<名前>
+    (python3.withPackages (ps: with ps; [
+      numpy
+      matplotlib
+      pandas
+      scipy
+      ipython
+    ]))
+    # nixpkgs に無いパッケージや、プロジェクト単位で固めたいときはこちら。
+    # uv venv && uv pip install <名前>  で普通に pip が使える。
+    uv
 
     # LSP（言語サーバは nix 側で管理。Mason は NixOS では使わない）
     lua-language-server

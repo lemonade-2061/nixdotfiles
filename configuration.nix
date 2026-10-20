@@ -176,6 +176,10 @@
   # USB 等の自動マウント基盤（フロントエンドは home.nix の udiskie）
   services.udisks2.enable = true;
 
+  # Noctalia のバッテリー表示と wireplumber の電源監視が D-Bus 経由で参照する。
+  # 素の Hyprland 構成では DE が有効化してくれないので明示的に入れる。
+  services.upower.enable = true;
+
   # メッシュVPN。初回は `sudo tailscale up` でログインが必要。
   services.tailscale.enable = true;
 }
