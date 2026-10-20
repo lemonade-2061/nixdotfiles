@@ -109,6 +109,15 @@
     fuzzel
     waybar
     quickshell
+    # Noctalia v5 (ネイティブ C++ / OpenGL ES の Wayland シェル)。
+    # v4 系 (noctalia-shell + noctalia-qs) は Quickshell/Qt ベースで EOL。
+    # upstream の noctalia-qs は 2026-07-15 にアーカイブ済みなので、
+    # 最初から v5 に寄せる (2026-10-15 移行)。
+    # 注意: v4 とは互換性が無い。バイナリ名 noctalia-shell -> noctalia、
+    # 設定 JSON -> TOML、IPC `noctalia-shell ipc call ...` -> `noctalia msg ...`。
+    # 設定は ~/.config/noctalia/config.toml (手書き層) と
+    # ~/.local/state/noctalia/settings.toml (GUI が書く層、こちらが優先)。
+    noctalia
     wl-clipboard
     grim
     slurp

@@ -127,11 +127,11 @@
         "nixpkgs": "nixpkgs_2"
       },
       "locked": {
-        "lastModified": 1787051501,
-        "narHash": "sha256-GChD+E+kJh2wE1wD3YAWDsPw1TPAbGhvEiY+0S0KcT4=",
+        "lastModified": 1792040296,
+        "narHash": "sha256-ZneGdoGW0iheFj8G8snUHqfhOt0DfdtjpmJCI/Bfg5U=",
         "owner": "bea4dev",
         "repo": "ShojiWM",
-        "rev": "9bb248cb8514df4c042fb41ec0e2c589a17b0f14",
+        "rev": "98f84845ebbaabf0cd847d7dc5ac628e5adfccce",
         "type": "github"
       },
       "original": {
