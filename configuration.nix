@@ -11,6 +11,7 @@
       ./boot.nix                 # ブートチェーン (Visor / GRUB / systemd-boot)
       ./kit-vpn.nix              # KIT Remote-VPN (openfortivpn) モジュール
       ./pico.nix                 # RaspberryPi Pico 開発環境 (udev / dialout)
+      ./kit-printer.nix          # KIT ネットワークプリンター (iogate3 / CUPS)
     ];
 
   # Use latest kernel.

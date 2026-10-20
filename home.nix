@@ -186,6 +186,8 @@
       lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
       clear = "printf '\\033[2J\\033[3J\\033[H'";
       "desktop-ssh" = "ssh -L 6080:localhost:6080 lemonade@100.108.23.90";
+      kprint = "lp -d netpr01c";
+      kpq = "lpstat -W not-completed -o";
     };
   };
 
@@ -209,6 +211,9 @@
       clear = "printf '\\033[2J\\033[3J\\033[H'";
       # Tailscale 経由でデスクトップ (archlinux) へ。noVNC 用に 6080 をフォワード。
       "desktop-ssh" = "ssh -L 6080:localhost:6080 lemonade@100.108.23.90";
+      # 学内プリンター (iogate3 / RICOH SP C840)。詳細は ~/nixos/kit-printer.md
+      kprint = "lp -d netpr01c";          # kprint ファイル で送信
+      kpq = "lpstat -W not-completed -o"; # 詰まっていないか確認
     };
 
     # 金沢工大の学内 Wi-Fi (KIT-WLAP2) は学外通信にプロキシ必須。
