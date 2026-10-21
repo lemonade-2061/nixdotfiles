@@ -6,7 +6,7 @@
 #   2. cmake 構成 → ninja でビルド        (Compile ボタン)
 #   3. picotool で .uf2 を書き込み         (RUN ボタン)
 #   4. シリアルモニタ表示
-# の4つなので、NixOS では 1 を devShell (flake.nix の devShells.pico)、
+# の4つなので、NixOS では 1 を devShell (shells/pico.nix)、
 # 2〜4 を pico-build / pico-flash / pico-mon コマンドに置き換える。VsCode は使わない。
 #
 # このファイルが受け持つのは root 権限が必要な部分だけ:

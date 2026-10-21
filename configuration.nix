@@ -8,7 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-      ./boot.nix                 # ブートチェーン (Visor / GRUB / systemd-boot)
+      ./boot.nix                 # ブートチェーン (Visor + systemd-boot フォールバック)
       ./kit-vpn.nix              # KIT Remote-VPN (openfortivpn) モジュール
       ./pico.nix                 # RaspberryPi Pico 開発環境 (udev / dialout)
       ./kit-printer.nix          # KIT ネットワークプリンター (iogate3 / CUPS)
@@ -93,6 +93,8 @@
   # settings for stateful data were taken. Do NOT change after install.
   system.stateVersion = "26.05";
 
+  # 常用は ShojiWM (flake.nix 側で有効化)。Hyprland は
+  # dotfiles/hypr の設定ごとフォールバックとして残している。
   programs.hyprland.enable = true;
 
   # コンテナ環境: rootless Podman + Docker 互換レイヤ。
@@ -108,14 +110,15 @@
     defaultNetwork.settings.dns_enabled = true;
   };
 
-  # カーソルテーマ（Bibata: 丸っこい三角形）。SDDM が探せるよう
-  # システム側にも入れておく（/run/current-system/sw/share/icons）。
+  # システム側に必要なものだけ。ユーザー向けは home.nix の home.packages。
   environment.systemPackages = with pkgs; [
+    # カーソルテーマ（Bibata: 丸っこい三角形）。SDDM が探せるよう
+    # システム側にも置く（/run/current-system/sw/share/icons）。
     bibata-cursors
     docker-compose # `docker compose` / `podman compose` の実体 (compose v2)
   ];
 
-  # SDDM ログイン画面（Wayland セッションで Hyprland を起動）
+  # SDDM ログイン画面（Wayland セッション。既定は下の defaultSession）
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
@@ -147,11 +150,12 @@
     quickshell.enable = false; # SDDM テーマだけ使う（ロック画面は未使用）
   };
 
-  # 既定セッションを「素の Hyprland」に固定する。
-  #   programs.hyprland は hyprland.desktop と hyprland-uwsm.desktop の
-  #   2つを入れるが、uwsm 版は programs.uwsm.enable が必要で未設定だと
-  #   ログイン後に黒画面で落ちる。TTY と同じ素の Hyprland を使う。
-  services.displayManager.defaultSession = "hyprland";
+  # 既定セッションは ShojiWM (常用のコンポジタ、flake.nix の programs.shojiwm)。
+  # Hyprland は下の programs.hyprland.enable でフォールバックとして残してあり、
+  # SDDM のセッション選択から選べる。そちらを選ぶ場合は "hyprland" (素のほう) を
+  # 使うこと: programs.hyprland は hyprland-uwsm.desktop も入れるが、uwsm 版は
+  # programs.uwsm.enable が必要で、未設定だとログイン後に黒画面で落ちる。
+  services.displayManager.defaultSession = "shojiwm";
 
   # ローカルLLM (ollama)。127.0.0.1:11434 で API を提供。
   # この機種 (8845HS + DDR5-5600 デュアルチャネル ≈90GB/s) はメモリ帯域律速で、
@@ -177,7 +181,7 @@
   services.udisks2.enable = true;
 
   # Noctalia のバッテリー表示と wireplumber の電源監視が D-Bus 経由で参照する。
-  # 素の Hyprland 構成では DE が有効化してくれないので明示的に入れる。
+  # 素のコンポジタ構成 (ShojiWM / Hyprland) では DE が有効化してくれないので明示する。
   services.upower.enable = true;
 
   # メッシュVPN。初回は `sudo tailscale up` でログインが必要。

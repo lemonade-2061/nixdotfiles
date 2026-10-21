@@ -132,12 +132,6 @@ in
   # ときは手で消すこと。
   boot.loader.systemd-boot.extraInstallCommands = ''
     ${visorMenuGen}
-
-    # 一時的な掃除: 旧 standalone GRUB 構成の名残。grubx64.efi は extraFiles
-    # のマーカー経由で自動削除されるが、grub.cfg はマーカー管理外だったので
-    # ここで消す。/boot/EFI/grub が消えたらこのブロックは削除してよい。
-    ${pkgs.coreutils}/bin/rm -f /boot/EFI/grub/grub.cfg
-    ${pkgs.coreutils}/bin/rmdir /boot/EFI/grub 2>/dev/null || true
   '';
 
   # systemd-boot 側からも Visor へ戻れるようにしておく

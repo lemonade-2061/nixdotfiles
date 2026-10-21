@@ -1,5 +1,21 @@
 { config, pkgs, inputs, ... }:
 
+let
+  # bash / zsh 共通のエイリアス。bash はフォールバック用に残してある。
+  commonAliases = {
+    nrs = "sudo nixos-rebuild switch --flake /home/lemonade/nixos#nixos";
+    nrl = "nixos-rebuild list-generations";
+    "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
+    lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
+    # 画面クリア後にスクロールバックも消す (2J=画面 3J=履歴 H=カーソル復帰)
+    clear = "printf '\\033[2J\\033[3J\\033[H'";
+    # Tailscale 経由でデスクトップ (archlinux) へ。noVNC 用に 6080 をフォワード。
+    "desktop-ssh" = "ssh -L 6080:localhost:6080 lemonade@100.108.23.90";
+    # 学内プリンター (iogate3 / RICOH SP C840)。詳細は ~/nixos/kit-printer.md
+    kprint = "lp -d netpr01c";          # kprint ファイル で送信
+    kpq = "lpstat -W not-completed -o"; # 詰まっていないか確認
+  };
+in
 {
   home.username = "lemonade";
   home.homeDirectory = "/home/lemonade";
@@ -41,7 +57,9 @@
     nix-output-monitor # nom: ビルドログをツリー表示
     nh           # nixos-rebuild ラッパー (nh os switch ~/nixos)
     hyfetch      # neofetch 後継 (素の見た目は neowofetch コマンド)
-    android-tools  # adb / fastboot（udev 権限は configuration.nix の programs.adb.enable 側）
+    # adb / fastboot。システム側の設定は不要 (NixOS 26.05 で programs.adb は
+    # 廃止。systemd 258 が USB デバイスへの uaccess を自動で付けるため)。
+    android-tools
     # starship は programs.starship 側で管理（下部参照）
 
     # エディタ補助（フォーマッタ / 検索 / ゴミ箱）
@@ -78,7 +96,7 @@
     rust-analyzer
     pyright
     gopls
-    # 使う言語が増えたらここに追記（例: pyright, rust-analyzer, gopls ...）
+    # 使う言語が増えたらここに追記（nix search nixpkgs#<名前> で探す）
 
     # snacks.image レンダリング用
     ghostscript   # gs（PDF）
@@ -94,7 +112,7 @@
 
     # ブラウザ
     firefox
-    inputs.zen-browser.packages.${pkgs.system}.default   # Zen Browser (flake input 経由)
+    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default   # Zen Browser (flake input 経由)
     chromium
     google-chrome   # Google アカウント同期用（unfree）
 
@@ -117,11 +135,13 @@
     onlyoffice-desktopeditors
     # vscode は programs.vscode (vscode-fhs) 側で入れる
 
-    # Wayland / Hyprland デスクトップ
+    # Wayland デスクトップ (ShojiWM / Hyprland 共通)
     foot
     kitty
     fuzzel
-    waybar
+    # 自作 Quickshell バーの実行環境。常用は下の noctalia だが、
+    # dotfiles/quickshell + ~/.config/shojiwm/src/index.tsx のコメントアウト部で
+    # いつでも戻せるようにしてある。壁紙ピッカーもこちら。
     quickshell
     # Noctalia v5 (ネイティブ C++ / OpenGL ES の Wayland シェル)。
     # v4 系 (noctalia-shell + noctalia-qs) は Quickshell/Qt ベースで EOL。
@@ -138,16 +158,16 @@
     hyprshot
     satty
     shikane
-    swww          # 壁紙デーモン（中身はawww: awww img <画像> で切り替え）
+    awww          # 壁紙デーモン (旧 swww。awww img <画像> で切り替え)
     pavucontrol   # 音量・出力先切替 GUI
     cliphist      # クリップボード履歴 (Super+SHIFT+V で fuzzel ピッカー)
-    libnotify     # notify-send (通知はquickshellのNotificationDaemonが受ける)
+    libnotify     # notify-send (通知は noctalia が受ける)
     obs-studio    # 配信・録画 (画面キャプチャはxdg-desktop-portal経由)
     brightnessctl # 輝度キー (XF86MonBrightness*) 用
   ];
 
   # カーソルテーマ（Bibata-Modern-Classic）。
-  # GTK / X11(XWayland) / Hyprland すべてに XCURSOR_* を通す。
+  # GTK / X11(XWayland) / コンポジタすべてに XCURSOR_* を通す。
   home.pointerCursor = {
     name = "Bibata-Modern-Classic";
     package = pkgs.bibata-cursors;
@@ -156,12 +176,17 @@
     x11.enable = true;
   };
 
-  # dotfiles symlink（ディレクトリ丸ごと — binds.lua 等の分割ファイルも含める）
+  # dotfiles symlink。mkOutOfStoreSymlink なので ~/nixos 側を直接編集すれば
+  # rebuild なしで反映される。
+  #
+  # hypr: フォールバックの Hyprland 用（常用の ShojiWM は ~/.config/shojiwm の
+  # TSX 設定を使うので、こちらは Hyprland セッションを選んだときだけ効く）。
   xdg.configFile."hypr".source =
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nixos/dotfiles/hypr";
 
-  # ディレクトリ丸ごと symlink（bar/ 等の分割ファイルも含める）
+  # quickshell: 自作バー (bar/) と通知デーモンと壁紙ピッカー。現在バーは
+  # noctalia に任せているため、ShojiWM 側から起動しているのは壁紙ピッカーのみ。
   xdg.configFile."quickshell".source =
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nixos/dotfiles/quickshell";
@@ -189,20 +214,9 @@
     VISUAL = "nvim";
   };
 
-  # 共通エイリアス（bash / zsh 両方に流し込む）
-  # bash はフォールバック用に残しておく。
   programs.bash = {
     enable = true;
-    shellAliases = {
-      nrs = "sudo nixos-rebuild switch --flake /home/lemonade/nixos#nixos";
-      nrl = "nixos-rebuild list-generations";
-      "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
-      lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
-      clear = "printf '\\033[2J\\033[3J\\033[H'";
-      "desktop-ssh" = "ssh -L 6080:localhost:6080 lemonade@100.108.23.90";
-      kprint = "lp -d netpr01c";
-      kpq = "lpstat -W not-completed -o";
-    };
+    shellAliases = commonAliases;
   };
 
   # zsh: 既定のログインシェル
@@ -216,19 +230,7 @@
       save = 10000;
       ignoreDups = true;
     };
-    shellAliases = {
-      nrs = "sudo nixos-rebuild switch --flake /home/lemonade/nixos#nixos";
-      nrl = "nixos-rebuild list-generations";
-      "kit-vpn" = "sudo openfortivpn -c /etc/openfortivpn/kit";
-      lsa = "eza -la --icons --git --group-directories-first --time-style=long-iso";
-      # 画面クリア後にスクロールバックも消す (2J=画面 3J=履歴 H=カーソル復帰)
-      clear = "printf '\\033[2J\\033[3J\\033[H'";
-      # Tailscale 経由でデスクトップ (archlinux) へ。noVNC 用に 6080 をフォワード。
-      "desktop-ssh" = "ssh -L 6080:localhost:6080 lemonade@100.108.23.90";
-      # 学内プリンター (iogate3 / RICOH SP C840)。詳細は ~/nixos/kit-printer.md
-      kprint = "lp -d netpr01c";          # kprint ファイル で送信
-      kpq = "lpstat -W not-completed -o"; # 詰まっていないか確認
-    };
+    shellAliases = commonAliases;
 
     # 金沢工大の学内 Wi-Fi (KIT-WLAP2) は学外通信にプロキシ必須。
     # シェル起動時に接続中なら自動で環境変数をセットする。
@@ -280,14 +282,6 @@
     nix-direnv.enable = true;
   };
 
-  # VSCode。中身は Microsoft 公式ビルドだが、素の pkgs.vscode ではなく
-  # FHS 環境で起動する pkgs.vscode-fhs を使う。拡張機能が同梱している
-  # プリビルドバイナリ (cpptools の clangd/gdb、Pico 拡張のツールチェーン等) が
-  # /lib64/ld-linux-x86-64.so.2 を探して動かないのを避けるため。
-  #
-  # Wayland ネイティブで起動したい場合は NIXOS_OZONE_WL=1 が必要
-  # (nixpkgs の wrapper がこれを見て --ozone-platform-hint=auto を足す)。
-  # Electron アプリ全体に効く変更なので、入れるなら home.sessionVariables 側で。
   # OnlyOffice は fontconfig を使わず自前で /usr/share/fonts・
   # /usr/local/share/fonts・~/.fonts を走査する。そのうえで走査時に
   # シンボリックリンクを読み飛ばすため、フォントが全部 store への
@@ -306,6 +300,14 @@
     done
   '';
 
+  # VSCode。中身は Microsoft 公式ビルドだが、素の pkgs.vscode ではなく
+  # FHS 環境で起動する pkgs.vscode-fhs を使う。拡張機能が同梱している
+  # プリビルドバイナリ (cpptools の clangd/gdb、Pico 拡張のツールチェーン等) が
+  # /lib64/ld-linux-x86-64.so.2 を探して動かないのを避けるため。
+  #
+  # Wayland ネイティブで起動したい場合は NIXOS_OZONE_WL=1 が必要
+  # (nixpkgs の wrapper がこれを見て --ozone-platform-hint=auto を足す)。
+  # Electron アプリ全体に効く変更なので、入れるなら home.sessionVariables 側で。
   programs.vscode = {
     enable = true;
     package = pkgs.vscode-fhs;
@@ -345,8 +347,9 @@
     };
   };
 
-  # 通知デーモンは quickshell が実装 (dotfiles/quickshell/notifications/)。
-  # mako 等を有効にすると org.freedesktop.Notifications を取り合うので入れない。
+  # 通知は noctalia が org.freedesktop.Notifications を取る。
+  # dotfiles/quickshell/notifications/ の自作デーモンは Quickshell バーに
+  # 戻すとき用。mako 等を足すと名前を取り合うので入れない。
 
   # USB 自動マウント（udisks2 は configuration.nix 側で有効化）。
   # バーに SNI トレイがないので tray は切っておく。
