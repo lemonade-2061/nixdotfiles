@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "flake-compat": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1767039857,
+        "narHash": "sha256-vNpUSpF5Nuw8xvDLj2KCwwksIbjua2LZCqhV1LNRDns=",
+        "owner": "NixOS",
+        "repo": "flake-compat",
+        "rev": "5edf11c44bc78a0d334f6334cdaf7d60d732daab",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "flake-compat",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -94,17 +110,18 @@
     },
     "qylock": {
       "inputs": {
+        "flake-compat": "flake-compat",
         "flake-utils": "flake-utils",
         "nixpkgs": [
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1785237734,
-        "narHash": "sha256-b8n7JH/hhQCAlFAi/IxPOm7rXsog++U0wuWnWeOiN5s=",
+        "lastModified": 1789360700,
+        "narHash": "sha256-ELHBl+9ueNJhoNYRioSIHb/K7f+SNsesG/+X5ijA+NA=",
         "ref": "refs/heads/main",
-        "rev": "c45eed24c0f9a3148a7d13081b28acc4d7874853",
-        "revCount": 177,
+        "rev": "f6561e2ceae33f26e5e660742a5df2f725cbe514",
+        "revCount": 190,
         "type": "git",
         "url": "file:///home/lemonade/git-clone/qylock"
       },
