@@ -45,6 +45,11 @@
         # Pico は単体 flake (pico-dev) 側が本体
         pico = inputs.pico-dev.devShells.x86_64-linux.default;
       };
+    
+    templates = {
+        python = { path = ./templates/python; description = "Python devShell";};
+        r = { path = ./templates/r; description = "R devShell";};
+    };
 
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
       system = "x86_64-linux";
