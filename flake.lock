@@ -92,6 +92,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1792773339,
+        "narHash": "sha256-rZLrzrC6i+jnTAlvPZHogKDulY7WWDEv9hJeHieO7Zw=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "3ec636362e1816bc2f0888fa0fa2c69f1bc9e504",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs_2": {
       "locked": {
         "lastModified": 1781577229,
@@ -105,6 +121,26 @@
         "owner": "NixOS",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "pico-dev": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792549253,
+        "narHash": "sha256-Qk9+i7KSMx2AnohtbYJbmAHSjB1WRtALBcwuqnhWKRs=",
+        "owner": "lemonade-2061",
+        "repo": "pico-dev",
+        "rev": "21590be23b02f808f8a151f89cda0896f3492ccb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lemonade-2061",
+        "repo": "pico-dev",
         "type": "github"
       }
     },
@@ -134,6 +170,8 @@
       "inputs": {
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-unstable": "nixpkgs-unstable",
+        "pico-dev": "pico-dev",
         "qylock": "qylock",
         "shojiwm": "shojiwm",
         "zen-browser": "zen-browser"

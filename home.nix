@@ -1,6 +1,13 @@
 { config, pkgs, inputs, ... }:
 
 let
+  # Android Studio 用。useGlobalPkgs = true なので home.nix 側の nixpkgs.config は
+  # 効かない → unstable を自前で import して allowUnfree を立てる。
+  pkgs-unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs.stdenv.hostPlatform) system;
+    config.allowUnfree = true;
+  };
+
   # bash / zsh 共通のエイリアス。bash はフォールバック用に残してある。
   commonAliases = {
     nrs = "sudo nixos-rebuild switch --flake /home/lemonade/nixos#nixos";
@@ -31,20 +38,27 @@ in
     vim
     gcc          # treesitter などのネイティブビルド用Cコンパイラ
     lazygit      # LazyVim の git 連携
+    gh           # GitHub CLI（PR レビュー等）
     tree
     fd
     bat
     btop
     fastfetch
     lolcat
-    claude-code
-    codex
+    # claude-code / codex は stable (26.05) が 2026-08 で凍結され backport も
+    # ないので unstable から取る。
+    pkgs-unstable.claude-code
+    pkgs-unstable.codex
     cowsay
     eza
     sd
     ripgrep
     cava
     awscli2      # AWS CLI v2
+    # ローカルサーバを https の公開 URL に出すトンネル (ハッカソンでスマホから叩く用)。
+    # unfree なので configuration.nix の allowUnfree 前提。authtoken は
+    # ngrok config add-authtoken <token> で ~/.config/ngrok/ngrok.yml に入る (Nix 管理外)。
+    ngrok
     rustc
     cargo
     rustfmt
@@ -60,6 +74,19 @@ in
     # adb / fastboot。システム側の設定は不要 (NixOS 26.05 で programs.adb は
     # 廃止。systemd 258 が USB デバイスへの uaccess を自動で付けるため)。
     android-tools
+    # Android Studio。nixpkgs 版は buildFHSEnv で包まれているので、IDE の
+    # SDK Manager が落としてくる素の動的リンクバイナリ (sdkmanager / emulator
+    # など) もその中では動く。宣言的に SDK を入れたい場合は ~/project/android-emu の
+    # androidenv ベースの flake を使う。
+    # 26.05 の stable 属性は Panda 4 で止まるので unstable から取る。
+    pkgs-unstable.android-studio
+    # JVM / Kotlin の CLI 一式。kotlin-lsp が Gradle プロジェクトをインポートする
+    # ときに JDK と gradle を要求するので (単体の .kt だけなら同梱 JBR で足りる)。
+    # JDK は Gradle 8.14 が対応する最新 LTS の 21 にしている (jdk25 は Gradle 9.1
+    # 以降でないと動かない)。Android Studio は自前の JBR / Gradle を使うので無関係。
+    jdk21
+    gradle
+    kotlin        # kotlinc: 単体ファイルをさっとコンパイルする用
     # starship は programs.starship 側で管理（下部参照）
 
     # エディタ補助（フォーマッタ / 検索 / ゴミ箱）
@@ -82,6 +109,7 @@ in
       matplotlib
       pandas
       scipy
+      laspy        # LAS/LAZ 点群
       ipython
     ]))
     # nixpkgs に無いパッケージや、プロジェクト単位で固めたいときはこちら。
@@ -96,6 +124,8 @@ in
     rust-analyzer
     pyright
     gopls
+    # Kotlin (JetBrains 公式の kotlin-lsp。nixpkgs に無いので pkgs/ で自前パッケージ化)
+    (callPackage ./pkgs/kotlin-lsp.nix { })
     # 使う言語が増えたらここに追記（nix search nixpkgs#<名前> で探す）
 
     # snacks.image レンダリング用

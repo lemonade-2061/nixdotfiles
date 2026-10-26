@@ -10,7 +10,6 @@
       ./hardware-configuration.nix
       ./boot.nix                 # ブートチェーン (Visor + systemd-boot フォールバック)
       ./kit-vpn.nix              # KIT Remote-VPN (openfortivpn) モジュール
-      ./pico.nix                 # RaspberryPi Pico 開発環境 (udev / dialout)
       ./kit-printer.nix          # KIT ネットワークプリンター (iogate3 / CUPS)
     ];
 
@@ -156,21 +155,6 @@
   # 使うこと: programs.hyprland は hyprland-uwsm.desktop も入れるが、uwsm 版は
   # programs.uwsm.enable が必要で、未設定だとログイン後に黒画面で落ちる。
   services.displayManager.defaultSession = "shojiwm";
-
-  # ローカルLLM (ollama)。127.0.0.1:11434 で API を提供。
-  # この機種 (8845HS + DDR5-5600 デュアルチャネル ≈90GB/s) はメモリ帯域律速で、
-  # 780M (iGPU) に投げても速度がほぼ変わらないため CPU 実行のまま運用する。
-  # ROCm を試すなら acceleration = "rocm" + rocmOverrideGfx = "11.0.2" を追加。
-  # モデル置き場は /var/lib/ollama (qwen3:30b-a3b で約18GB)。
-  services.ollama = {
-    enable = true;
-    environmentVariables = {
-      # 既定 4096 では長文が入らない。KV キャッシュ分 RAM を食うが 32GB なら許容。
-      OLLAMA_CONTEXT_LENGTH = "16384";
-      # 使い終わったモデルを 5 分で RAM から降ろす (既定値)。常駐させたければ "-1"。
-      OLLAMA_KEEP_ALIVE = "5m";
-    };
-  };
 
   services.pipewire = {
     enable = true;
