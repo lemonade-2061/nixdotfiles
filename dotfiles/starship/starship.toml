@@ -3,12 +3,19 @@
 # プロンプト前の空行なし
 add_newline = false
 
+# 1行目: ユーザー/パス + git ── 罫線で右端へ ── 言語・所要時間・時計
+# 2行目: ❯ (直前コマンドの成否で色が変わる)
 format = """
-[╭─](fg:muted) \
+[╭─ ](fg:muted)\
+$os\
 $username\
+$hostname\
 $directory\
 $git_branch\
 $git_status\
+[ ](fg:muted)\
+$fill\
+$nix_shell\
 $c\
 $elixir\
 $elm\
@@ -22,30 +29,60 @@ $rust\
 $scala\
 $conda\
 $python\
-$time\n\
-[╰─](fg:muted)[❯](fg:nixblue) \
-"""
+$cmd_duration\
+$time\
+[─╮](fg:muted)\
+$line_break\
+[╰─](fg:muted)$character"""
 
 palette = "slate-blue"
 
 # kitty / quickshell バーと同じ Slate Blue (Nord 風グレーブルー) 系統
 [palettes.slate-blue]
-surface = '#2e3440' # カプセル背景 (ターミナル背景 #20242e より一段明るい面)
-muted = '#6c7689'
-text = '#d2d9e8'
-blue = '#81a1c1'
-frost = '#a3b8d8'
-steel = '#5e81ac'
-nixblue = '#7ebae4' # バーのメインアクセント
-coral = '#e48b7e'
-red = '#bf616a'
-green = '#a3be8c'
-yellow = '#ebcb8b'
-teal = '#8fbcbb'
+line = '#6f7d96' # 右寄せの罫線
+muted = '#8a94a8' # 枠線・区切りアイコン (背景 #20242e 上でも読める明るさ)
+text = '#e5e9f0'
+blue = '#88c0d0'
+frost = '#c8d6ee' # ユーザー名・時刻
+nixblue = '#8cc8f0' # メインアクセント (バーより少し明るく)
+red = '#e06c75'
+green = '#b5d98f'
+yellow = '#f0d58c'
+teal = '#93d6d0'
+
+[fill]
+symbol = "─"
+style = "fg:line"
+
+# 左端の Nix ロゴ
+[os]
+disabled = false
+format = "[$symbol]($style)"
+style = "fg:nixblue"
+
+[os.symbols]
+NixOS = " "
+Arch = " "
+Linux = " "
+
+[username]
+disabled = false
+show_always = true
+format = "[$user]($style)"
+style_user = "fg:frost"
+style_root = "fg:red bold"
+
+# SSH 先でのみホスト名を出す
+[hostname]
+ssh_only = true
+format = "[@$hostname]($style)"
+style = "fg:teal"
 
 [directory]
-format = "[](fg:surface)[ $path ]($style)[](fg:surface) "
-style = "bg:surface fg:nixblue"
+format = "[  ](fg:blue)[$path]($style)[$read_only]($read_only_style)"
+style = "fg:nixblue bold"
+read_only = " "
+read_only_style = "fg:red"
 # 折り返し（プロンプト複製の原因）を防ぐため表示は末尾2階層まで
 truncation_length = 2
 truncation_symbol = "…/"
@@ -56,118 +93,130 @@ Downloads = " "
 Music = " "
 Pictures = " "
 
+# git はリポジトリ内でだけ現れる
 [git_branch]
-format = "[](fg:surface)[ $symbol $branch ]($style)[](fg:surface) "
-style = "bg:surface fg:teal"
+format = "[  ](fg:muted)[$symbol $branch]($style)"
+style = "fg:teal"
 # 長いブランチ名で折り返さないよう20文字で切る
 truncation_length = 20
-symbol = ""
+symbol = ""
 
 [git_status]
 disabled = false
-style = "bg:surface fg:coral"
-format = '[](fg:surface)([$all_status$ahead_behind]($style))[](fg:surface) '
-up_to_date = '[ ✓ ](bg:surface fg:green)'
-untracked = '[?\($count\)](bg:surface fg:yellow)'
-stashed = '[\$](bg:surface fg:frost)'
-modified = '[!\($count\)](bg:surface fg:yellow)'
-renamed = '[»\($count\)](bg:surface fg:frost)'
-deleted = '[✘\($count\)](bg:surface fg:red)'
-staged = '[++\($count\)](bg:surface fg:green)'
-ahead = '[⇡\(${count}\)](bg:surface fg:teal)'
-diverged = '⇕[\[](bg:surface fg:frost)[⇡\(${ahead_count}\)](bg:surface fg:teal)[⇣\(${behind_count}\)](bg:surface fg:coral)[\]](bg:surface fg:frost)'
-behind = '[⇣\(${count}\)](bg:surface fg:coral)'
+style = "fg:yellow"
+format = '( [$all_status$ahead_behind]($style))'
+up_to_date = '[✓ ](fg:green)'
+untracked = '[?$count ](fg:yellow)'
+stashed = '[\$ ](fg:frost)'
+modified = '[!$count ](fg:yellow)'
+renamed = '[»$count ](fg:frost)'
+deleted = '[✘$count ](fg:red)'
+staged = '[+$count ](fg:green)'
+ahead = '[⇡$count ](fg:teal)'
+behind = '[⇣$count ](fg:red)'
+diverged = '[⇡$ahead_count⇣$behind_count ](fg:red)'
 
+# ---- 右側 ----
+
+[nix_shell]
+format = "[ $symbol$name]($style)"
+symbol = " "
+style = "fg:teal"
+heuristic = false
+
+[cmd_duration]
+min_time = 2000
+format = "[   $duration]($style)"
+style = "fg:yellow"
+
+# 右端の時計
 [time]
 disabled = false
-format = " [](fg:surface)[ $time  ]($style)[](fg:surface)"
-style = "bg:surface fg:steel"
+format = "[  ](fg:muted)[$time \U000f0954]($style) "
+style = "fg:frost"
 time_format = "%I:%M%P"
-use_12hr = true
 
-[username]
-disabled = false
-format = "[](fg:surface)[ ](bg:surface fg:nixblue)[$user ]($style)[](fg:surface) "
-show_always = true
-style_root = "bg:surface fg:red"
-style_user = "bg:surface fg:frost"
+[character]
+success_symbol = "[❯](bold fg:nixblue)"
+error_symbol = "[❯](bold fg:red)"
+vimcmd_symbol = "[❮](bold fg:green)"
 
 # Languages
 
 [c]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = " "
 
 [elixir]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = " "
 
 [elm]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = " "
 
 [golang]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = " "
 
 [haskell]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = " "
 
 [java]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = " "
 
 [julia]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = " "
 
 [nodejs]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = "󰎙 "
 
 [nim]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = "󰆥 "
 
 [rust]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = " "
 
 [scala]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = " "
 
 [python]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$version ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$version]($style)"
 disabled = false
 symbol = ' '
 
 [conda]
-style = "bg:surface fg:blue"
-format = " [](fg:surface)[ $symbol$environment ]($style)[](fg:surface)"
+style = "fg:blue"
+format = "[  $symbol$environment]($style)"
 disabled = false
 symbol = '🅒 '
