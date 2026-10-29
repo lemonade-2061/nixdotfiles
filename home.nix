@@ -270,7 +270,7 @@ in
       # これが無いとリサイズで折り返したプロンプトを kitty が消去できず、
       # 同じ行が下に複製される (starship のバグではなく統合未ロードが原因)。
       if [[ -n "$KITTY_INSTALLATION_DIR" ]]; then
-        export KITTY_SHELL_INTEGRATION="no-rc"
+        export KITTY_SHELL_INTEGRATION="no-rc no-cursor"
         autoload -Uz -- "$KITTY_INSTALLATION_DIR"/shell-integration/zsh/kitty-integration
         kitty-integration
         unfunction kitty-integration
