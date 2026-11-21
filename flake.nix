@@ -49,6 +49,7 @@
     templates = {
         python = { path = ./templates/python; description = "Python devShell";};
         r = { path = ./templates/r; description = "R devShell";};
+        android = { path = ./templates/android; description = "Android (Gradle CLI) devShell";};
     };
 
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {

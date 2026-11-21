@@ -30,6 +30,8 @@
   # Configure network connections interactively with nmcli or nmtui.
   networking.networkmanager.enable = true;
 
+  hardware.bluetooth.enable = true;
+
   # Set your time zone.
   time.timeZone = "Asia/Tokyo";
 
@@ -170,4 +172,14 @@
 
   # メッシュVPN。初回は `sudo tailscale up` でログインが必要。
   services.tailscale.enable = true;
+
+  # スマホ (Android) との USB なしデータ受け渡し。どちらも同一 LAN 上で相手を自動検出する。
+  # 学校の Wi-Fi は端末間通信が遮断されるので、そこでは Tailscale の IP を手入力して繋ぐ。
+  # KDE Connect: ファイル送信 + クリップボード共有 + 通知転送 (1714-1764/tcp,udp を開ける)
+  programs.kdeconnect.enable = true;
+  # LocalSend: 送るだけのシンプルな AirDrop 風アプリ (53317/tcp,udp を開ける)
+  programs.localsend = {
+    enable = true;
+    openFirewall = true;
+  };
 }

@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell
 
 // NixOSロゴのランチャーボタン
-// クリックで fuzzel をバー左端の真下に出す。
+// クリックで Noctalia のランチャーを開く (Noctalia 起動中のみ)。
 Rectangle {
   id: root
   anchors.verticalCenter: parent.verticalCenter
@@ -28,6 +28,6 @@ Rectangle {
     anchors.fill: parent
     hoverEnabled: true
     onClicked: Quickshell.execDetached(
-      ["fuzzel", "--anchor", "top-left", "--x-margin", "6", "--y-margin", "38"])
+      ["noctalia", "msg", "panel-toggle", "launcher"])
   }
 }

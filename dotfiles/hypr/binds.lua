@@ -14,7 +14,7 @@ hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + space", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + C", hl.dsp.layout("togglesplit"))    -- dwindle only
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(p.menu))          -- アプリランチャー (fuzzel)
+hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(p.menu))          -- アプリランチャー (Noctalia)
 
 -- Move focus
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -41,7 +41,7 @@ hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("qs ipc call notifications toggle")) 
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd("hyprshot -m region --clipboard-only"))
 hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd("hyprshot -m window -o ~/Pictures"))
 hl.bind(mainMod .. " + SHIFT + U", hl.dsp.exec_cmd("hyprshot -m output -o ~/Pictures")) -- 全画面スクショ
-hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("sh -c 'cliphist list | fuzzel --dmenu | cliphist decode | wl-copy'")) -- クリップボード履歴
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("noctalia msg panel-toggle clipboard")) -- クリップボード履歴
 
 
 -- Switch workspaces with mainMod + [0-9]

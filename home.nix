@@ -38,6 +38,9 @@ in
     vim
     gcc          # treesitter などのネイティブビルド用Cコンパイラ
     lazygit      # LazyVim の git 連携
+    # ShojiWM のターミナル背景切り替え。本体は設定ディレクトリ側 (git 管理) に置き、
+    # ここは PATH に出す入口だけ。中身を変えても rebuild は要らない
+    (writeShellScriptBin "shoji" ''exec "$HOME/.config/shojiwm/bin/shoji" "$@"'')
     gh           # GitHub CLI（PR レビュー等）
     tree
     fd
@@ -55,6 +58,8 @@ in
     ripgrep
     cava
     awscli2      # AWS CLI v2
+    # Supabase CLI (PD2 のマイグレーション用)。更新が速いので unstable から取る
+    pkgs-unstable.supabase-cli
     # ローカルサーバを https の公開 URL に出すトンネル (ハッカソンでスマホから叩く用)。
     # unfree なので configuration.nix の allowUnfree 前提。authtoken は
     # ngrok config add-authtoken <token> で ~/.config/ngrok/ngrok.yml に入る (Nix 管理外)。
@@ -63,7 +68,13 @@ in
     cargo
     rustfmt
     clippy
+    # ターミナル用スクリーンセーバー
     cmatrix
+    cbonsai       # 盆栽 (cbonsai -l でライブ成長、-S でスクリーンセーバーモード)
+    pipes-rs      # pipes.sh の Rust 版
+    asciiquarium-transparent  # 水族館 (-t で背景透過)
+    tty-clock     # デジタル時計 (tty-clock -sc)
+    terminal-parrot  # パーティーパロット
     jq           # JSON 加工
     unzip
     p7zip
@@ -168,7 +179,6 @@ in
     # Wayland デスクトップ (ShojiWM / Hyprland 共通)
     foot
     kitty
-    fuzzel
     # 自作 Quickshell バーの実行環境。常用は下の noctalia だが、
     # dotfiles/quickshell + ~/.config/shojiwm/src/index.tsx のコメントアウト部で
     # いつでも戻せるようにしてある。壁紙ピッカーもこちら。
@@ -190,7 +200,7 @@ in
     shikane
     awww          # 壁紙デーモン (旧 swww。awww img <画像> で切り替え)
     pavucontrol   # 音量・出力先切替 GUI
-    cliphist      # クリップボード履歴 (Super+SHIFT+V で fuzzel ピッカー)
+    cliphist      # クリップボード履歴 (ピッカーは Noctalia の clipboard パネル)
     libnotify     # notify-send (通知は noctalia が受ける)
     obs-studio    # 配信・録画 (画面キャプチャはxdg-desktop-portal経由)
     brightnessctl # 輝度キー (XF86MonBrightness*) 用

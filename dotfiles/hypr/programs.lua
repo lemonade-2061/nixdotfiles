@@ -2,5 +2,5 @@
 return {
     terminal    = "kitty",
     fileManager = "kitty yazi",  -- dolphin は未インストールだったので yazi (TUI) に
-    menu        = "fuzzel",
+    menu        = "noctalia msg panel-toggle launcher",
 }

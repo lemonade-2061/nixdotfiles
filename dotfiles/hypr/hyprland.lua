@@ -31,7 +31,7 @@ hl.monitor({
 
 hl.on("hyprland.start", function()
 	hl.exec_cmd("fcitx5 --replace -d") -- 日本語入力
-	hl.exec_cmd("qs") -- Quickshell バー
+	hl.exec_cmd("noctalia") -- Noctalia v5 シェル (旧: qs = 自作 Quickshell バー)
 	hl.exec_cmd("awww-daemon") -- 壁紙デーモン (swww後継、パッケージ名はswwwのまま)
 	-- クリップボード履歴 (Super+SHIFT+V で呼び出し)
 	hl.exec_cmd("wl-paste --type text --watch cliphist store")
