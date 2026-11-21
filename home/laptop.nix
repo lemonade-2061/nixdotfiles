@@ -1,7 +1,7 @@
 { config, pkgs, inputs, ... }:
 
 let
-  # Android Studio 用。useGlobalPkgs = true なので home.nix 側の nixpkgs.config は
+  # Android Studio 用。useGlobalPkgs = true なので home-manager 側の nixpkgs.config は
   # 効かない → unstable を自前で import して allowUnfree を立てる。
   pkgs-unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs.stdenv.hostPlatform) system;
@@ -29,59 +29,28 @@ in
 
   home.stateVersion = "26.05";
 
-  #package
+  # CLI / 開発ツール・LSP は common.nix (デスクトップの Arch と共有)
+  imports = [ ./common.nix ];
+
+  # ここはラップトップ (NixOS) 専用のパッケージ。
+  # デスクトップでは pacman 側にあるもの (rustup / gcc / python / claude-code) や
+  # GUI アプリはこちらに置く。
   home.packages = with pkgs; [
 
-    # CLI / dev
-    git
-    neovim
-    vim
     gcc          # treesitter などのネイティブビルド用Cコンパイラ
-    lazygit      # LazyVim の git 連携
     # ShojiWM のターミナル背景切り替え。本体は設定ディレクトリ側 (git 管理) に置き、
     # ここは PATH に出す入口だけ。中身を変えても rebuild は要らない
     (writeShellScriptBin "shoji" ''exec "$HOME/.config/shojiwm/bin/shoji" "$@"'')
-    gh           # GitHub CLI（PR レビュー等）
-    tree
-    fd
-    bat
-    btop
-    fastfetch
-    lolcat
     # claude-code / codex は stable (26.05) が 2026-08 で凍結され backport も
     # ないので unstable から取る。
     pkgs-unstable.claude-code
     pkgs-unstable.codex
-    cowsay
-    eza
-    sd
-    ripgrep
-    cava
-    awscli2      # AWS CLI v2
     # Supabase CLI (PD2 のマイグレーション用)。更新が速いので unstable から取る
     pkgs-unstable.supabase-cli
-    # ローカルサーバを https の公開 URL に出すトンネル (ハッカソンでスマホから叩く用)。
-    # unfree なので configuration.nix の allowUnfree 前提。authtoken は
-    # ngrok config add-authtoken <token> で ~/.config/ngrok/ngrok.yml に入る (Nix 管理外)。
-    ngrok
     rustc
     cargo
     rustfmt
     clippy
-    # ターミナル用スクリーンセーバー
-    cmatrix
-    cbonsai       # 盆栽 (cbonsai -l でライブ成長、-S でスクリーンセーバーモード)
-    pipes-rs      # pipes.sh の Rust 版
-    asciiquarium-transparent  # 水族館 (-t で背景透過)
-    tty-clock     # デジタル時計 (tty-clock -sc)
-    terminal-parrot  # パーティーパロット
-    jq           # JSON 加工
-    unzip
-    p7zip
-    nvd          # 世代間の差分表示 (nvd diff /run/current-system result)
-    nix-output-monitor # nom: ビルドログをツリー表示
-    nh           # nixos-rebuild ラッパー (nh os switch ~/nixos)
-    hyfetch      # neofetch 後継 (素の見た目は neowofetch コマンド)
     # adb / fastboot。システム側の設定は不要 (NixOS 26.05 で programs.adb は
     # 廃止。systemd 258 が USB デバイスへの uaccess を自動で付けるため)。
     android-tools
@@ -100,17 +69,6 @@ in
     kotlin        # kotlinc: 単体ファイルをさっとコンパイルする用
     # starship は programs.starship 側で管理（下部参照）
 
-    # エディタ補助（フォーマッタ / 検索 / ゴミ箱）
-    stylua        # Lua フォーマッタ (conform)
-    fish          # fish_indent 同梱 (conform)
-    fzf           # LazyVim / picker
-    ast-grep      # grug-far の拡張検索
-    trash-cli     # snacks explorer で安全な削除 (trash コマンド)
-    prettier      # prettier extra (conform)
-    black         # Python フォーマッタ (black extra)
-    tree-sitter   # nvim-treesitter main ブランチのパーサーコンパイルに必須
-    sqlite        # snacks picker の frecency / 履歴保存
-
     # Python 本体 + よく使うライブラリ。
     # NixOS ではシステムの Python に pip install できない (store が読み取り専用)
     # ので、常用するものはここに宣言して入れる。追加したいときはこのリストに
@@ -123,32 +81,11 @@ in
       laspy        # LAS/LAZ 点群
       ipython
     ]))
-    # nixpkgs に無いパッケージや、プロジェクト単位で固めたいときはこちら。
-    # uv venv && uv pip install <名前>  で普通に pip が使える。
-    uv
-
-    # LSP（言語サーバは nix 側で管理。Mason は NixOS では使わない）
-    lua-language-server
-    nixd                  # Nix
-    bash-language-server
-    texlab                # LaTeX
-    rust-analyzer
-    pyright
-    gopls
-    # Kotlin (JetBrains 公式の kotlin-lsp。nixpkgs に無いので pkgs/ で自前パッケージ化)
-    (callPackage ./pkgs/kotlin-lsp.nix { })
-    # 使う言語が増えたらここに追記（nix search nixpkgs#<名前> で探す）
-
-    # snacks.image レンダリング用
-    ghostscript   # gs（PDF）
-    tectonic      # LaTeX 数式
-    mermaid-cli   # mmdc（Mermaid 図）
 
     # ビューア / ファイルマネージャ
     mpv           # 動画
     imv           # 画像
     zathura       # PDF
-    yazi          # TUI ファイルマネージャ
 
 
     # ブラウザ
@@ -247,12 +184,6 @@ in
   xdg.configFile."fastfetch".source =
     config.lib.file.mkOutOfStoreSymlink
       "${config.home.homeDirectory}/nixos/dotfiles/fastfetch";
-
-  # 既定エディタを nvim に（git commit / crontab -e 等もこれを見る）
-  home.sessionVariables = {
-    EDITOR = "nvim";
-    VISUAL = "nvim";
-  };
 
   programs.bash = {
     enable = true;

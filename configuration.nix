@@ -79,11 +79,11 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Define a user account. Don't forget to set a password with 'passwd'.
-  # ユーザーパッケージは home-manager (home.nix) で管理する。
+  # ユーザーパッケージは home-manager (home/laptop.nix, 共通部分は home/common.nix) で管理する。
   users.users.lemonade = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" ]; # Enable 'sudo' for the user.
-    shell = pkgs.zsh; # ログインシェルを zsh に（設定は home.nix の programs.zsh）
+    shell = pkgs.zsh; # ログインシェルを zsh に（設定は home/laptop.nix の programs.zsh）
   };
 
   # zsh を /etc/shells に登録（ログインシェルにするのに必須）。
@@ -111,7 +111,7 @@
     defaultNetwork.settings.dns_enabled = true;
   };
 
-  # システム側に必要なものだけ。ユーザー向けは home.nix の home.packages。
+  # システム側に必要なものだけ。ユーザー向けは home/*.nix の home.packages。
   environment.systemPackages = with pkgs; [
     # カーソルテーマ（Bibata: 丸っこい三角形）。SDDM が探せるよう
     # システム側にも置く（/run/current-system/sw/share/icons）。
@@ -163,7 +163,7 @@
     pulse.enable = true;
   };
 
-  # USB 等の自動マウント基盤（フロントエンドは home.nix の udiskie）
+  # USB 等の自動マウント基盤（フロントエンドは home/laptop.nix の udiskie）
   services.udisks2.enable = true;
 
   # Noctalia のバッテリー表示と wireplumber の電源監視が D-Bus 経由で参照する。

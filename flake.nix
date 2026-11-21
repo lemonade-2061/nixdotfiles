@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
-    # Android Studio だけ unstable から取るための入力 (home.nix 参照)。
+    # Android Studio だけ unstable から取るための入力 (home/laptop.nix 参照)。
     # nixpkgs は安定ブランチに Android Studio のメジャー更新を backport しない
     # ので、26.05 のままだと Panda 4 (2026-05) で止まる。
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -76,9 +76,21 @@
           home-manager.useUserPackages = true;
           home-manager.backupFileExtension = "hm-backup";
           home-manager.extraSpecialArgs = { inherit inputs; };
-          home-manager.users.lemonade = import ./home.nix;
+          home-manager.users.lemonade = import ./home/laptop.nix;
         }
       ];
+    };
+
+    # デスクトップ (Arch + Hyprland) 用の standalone Home Manager。
+    # common.nix の CLI / 開発ツールだけを入れる (GUI とシステムは pacman 側)。
+    #   home-manager switch --flake ~/projects/nixdotfiles#lemonade@desktop
+    homeConfigurations."lemonade@desktop" = home-manager.lib.homeManagerConfiguration {
+      pkgs = import nixpkgs {
+        system = "x86_64-linux";
+        config.allowUnfree = true; # ngrok
+      };
+      extraSpecialArgs = { inherit inputs; };
+      modules = [ ./home/desktop.nix ];
     };
   };
 }
