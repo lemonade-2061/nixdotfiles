@@ -13,6 +13,7 @@
     neovim
     vim
     lazygit      # LazyVim の git 連携
+    gitui        # LazyVim util.gitui extra
     gh           # GitHub CLI（PR レビュー等）
     tree
     fd
@@ -67,6 +68,7 @@
     # LSP（言語サーバは nix 側で管理。Mason は使わない）
     lua-language-server
     nixd                  # Nix
+    nil                   # Nix (デスクトップの LazyVim lang.nix extra が使う)
     bash-language-server
     shellcheck            # bash-language-server が診断に使う
     yaml-language-server
@@ -77,6 +79,20 @@
     rust-analyzer
     pyright
     gopls
+    taplo                 # TOML
+    zls                   # Zig
+    marksman              # Markdown
+
+    # フォーマッタ / リンタ (LazyVim lang extras の conform / nvim-lint が PATH から使う)
+    gofumpt
+    gotools               # goimports
+    golangci-lint
+    ruff                  # Python
+    shfmt
+    markdownlint-cli2
+    markdown-toc
+    hadolint              # Dockerfile
+    sqlfluff
     # Kotlin (JetBrains 公式の kotlin-lsp。nixpkgs に無いので pkgs/ で自前パッケージ化)
     (callPackage ../pkgs/kotlin-lsp.nix { })
     # 使う言語が増えたらここに追記（nix search nixpkgs#<名前> で探す）
